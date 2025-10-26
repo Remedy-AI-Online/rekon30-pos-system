@@ -18,6 +18,8 @@ import { SuperAdminBackups } from "./super-admin/SuperAdminBackups"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import { Textarea } from "./ui/textarea"
+import { Sheet, SheetContent } from "./ui/sheet"
+import { Menu } from "lucide-react"
 import { toast } from "sonner"
 import { superAdminService } from "../utils/superAdminService"
 import { 
@@ -103,6 +105,8 @@ export function SuperAdminPanel({ onLogout }: SuperAdminPanelProps) {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
@@ -138,6 +142,15 @@ export function SuperAdminPanel({ onLogout }: SuperAdminPanelProps) {
       businessSubscription.unsubscribe()
       paymentSubscription.unsubscribe()
     }
+  }, [])
+
+  // Handle window resize for responsive sidebar
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 768)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const loadBusinesses = async () => {
@@ -316,15 +329,52 @@ export function SuperAdminPanel({ onLogout }: SuperAdminPanelProps) {
   }
 
   return (
-    <div className="h-screen flex">
-      <SuperAdminSidebar
-        activeTab={activeTab}
-        onSelect={setActiveTab}
-        user={{ name: 'Super Admin', role: 'super_admin' }}
-        onLogout={onLogout}
-      />
-      <div className="flex-1 overflow-hidden">
-        <div className="p-4 compact-spacing h-full overflow-auto">
+    <div className="flex h-screen bg-background">
+      {/* Desktop Sidebar - rendered only on desktop */}
+      {isDesktop && (
+        <aside className="w-64 flex-shrink-0">
+          <SuperAdminSidebar
+            activeTab={activeTab}
+            onSelect={setActiveTab}
+            user={{ name: 'Super Admin', role: 'super_admin' }}
+            onLogout={onLogout}
+          />
+        </aside>
+      )}
+
+      {/* Mobile Sidebar - Sheet overlay for mobile */}
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="left" className="p-0 w-64" aria-describedby={undefined}>
+          <SuperAdminSidebar
+            activeTab={activeTab}
+            onSelect={(tab) => {
+              setActiveTab(tab)
+              setMobileMenuOpen(false)
+            }}
+            user={{ name: 'Super Admin', role: 'super_admin' }}
+            onLogout={onLogout}
+          />
+        </SheetContent>
+      </Sheet>
+
+      <main className="flex-1 overflow-hidden flex flex-col">
+        {/* Mobile Menu Button - visible only on mobile */}
+        {!isDesktop && (
+          <div className="p-4 border-b border-border bg-card">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(true)}
+              className="gap-2"
+            >
+              <Menu className="h-5 w-5" />
+              <span>Super Admin Menu</span>
+            </Button>
+          </div>
+        )}
+
+        <div className="flex-1 overflow-hidden">
+          <div className="p-4 compact-spacing h-full overflow-auto">
           {/* Loading State */}
           {loading && (
             <div className="flex items-center justify-center h-full">
@@ -409,9 +459,10 @@ export function SuperAdminPanel({ onLogout }: SuperAdminPanelProps) {
           )}
         </div>
       </div>
+    </main>
 
-      {/* Business Details Dialog */}
-      <Dialog open={showBusinessDetails} onOpenChange={setShowBusinessDetails}>
+    {/* Business Details Dialog */}
+    <Dialog open={showBusinessDetails} onOpenChange={setShowBusinessDetails}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>Business Details</DialogTitle>
@@ -461,146 +512,146 @@ export function SuperAdminPanel({ onLogout }: SuperAdminPanelProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Payment Verification Dialog */}
-      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5" />
-              Verify Payment
-            </DialogTitle>
-            <DialogDescription>
-              Manually verify a payment for a business
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="business-select">Select Business</Label>
-              <Select
-                value={paymentData.businessId}
-                onValueChange={(value: string) => setPaymentData({...paymentData, businessId: value})}
-              >
-                <SelectTrigger id="business-select">
-                  <SelectValue placeholder="Choose a business" />
-                </SelectTrigger>
-                <SelectContent>
-                  {businesses.map(business => (
-                    <SelectItem key={business.id} value={business.id}>
-                      {business.businessName} - {business.email}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="amount">Amount (₵)</Label>
-              <Input
-                id="amount"
-                type="number"
-                placeholder="400"
-                value={paymentData.amount}
-                onChange={(e) => setPaymentData({...paymentData, amount: e.target.value})}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="payment-method">Payment Method</Label>
-              <Select
-                value={paymentData.paymentMethod}
-                onValueChange={(value: string) => setPaymentData({...paymentData, paymentMethod: value})}
-              >
-                <SelectTrigger id="payment-method">
-                  <SelectValue placeholder="Select payment method" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="MoMo">Mobile Money (MoMo)</SelectItem>
-                  <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
-                  <SelectItem value="Cash">Cash</SelectItem>
-                  <SelectItem value="Card">Card</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="reference">Reference/Transaction ID (Optional)</Label>
-              <Input
-                id="reference"
-                placeholder="e.g., TXN123456"
-                value={paymentData.reference}
-                onChange={(e) => setPaymentData({...paymentData, reference: e.target.value})}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="notes">Notes (Optional)</Label>
-              <Textarea
-                id="notes"
-                placeholder="Additional notes about this payment..."
-                value={paymentData.notes}
-                onChange={(e) => setPaymentData({...paymentData, notes: e.target.value})}
-                rows={3}
-              />
-            </div>
-
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-600">
-                <strong>Note:</strong> This will mark the payment as verified and update the business payment status.
-              </p>
-            </div>
+    {/* Payment Verification Dialog */}
+    <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5" />
+            Verify Payment
+          </DialogTitle>
+          <DialogDescription>
+            Manually verify a payment for a business
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="business-select">Select Business</Label>
+            <Select
+              value={paymentData.businessId}
+              onValueChange={(value: string) => setPaymentData({...paymentData, businessId: value})}
+            >
+              <SelectTrigger id="business-select">
+                <SelectValue placeholder="Choose a business" />
+              </SelectTrigger>
+              <SelectContent>
+                {businesses.map(business => (
+                  <SelectItem key={business.id} value={business.id}>
+                    {business.businessName} - {business.email}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => {
-              setShowPaymentDialog(false)
-              setPaymentData({
-                businessId: "",
-                amount: "",
-                paymentMethod: "",
-                reference: "",
-                notes: ""
+
+          <div>
+            <Label htmlFor="amount">Amount (₵)</Label>
+            <Input
+              id="amount"
+              type="number"
+              placeholder="400"
+              value={paymentData.amount}
+              onChange={(e) => setPaymentData({...paymentData, amount: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="payment-method">Payment Method</Label>
+            <Select
+              value={paymentData.paymentMethod}
+              onValueChange={(value: string) => setPaymentData({...paymentData, paymentMethod: value})}
+            >
+              <SelectTrigger id="payment-method">
+                <SelectValue placeholder="Select payment method" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="MoMo">Mobile Money (MoMo)</SelectItem>
+                <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                <SelectItem value="Cash">Cash</SelectItem>
+                <SelectItem value="Card">Card</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="reference">Reference/Transaction ID (Optional)</Label>
+            <Input
+              id="reference"
+              placeholder="e.g., TXN123456"
+              value={paymentData.reference}
+              onChange={(e) => setPaymentData({...paymentData, reference: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="notes">Notes (Optional)</Label>
+            <Textarea
+              id="notes"
+              placeholder="Additional notes about this payment..."
+              value={paymentData.notes}
+              onChange={(e) => setPaymentData({...paymentData, notes: e.target.value})}
+              rows={3}
+            />
+          </div>
+
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-600">
+              <strong>Note:</strong> This will mark the payment as verified and update the business payment status.
+            </p>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => {
+            setShowPaymentDialog(false)
+            setPaymentData({
+              businessId: "",
+              amount: "",
+              paymentMethod: "",
+              reference: "",
+              notes: ""
+            })
+          }}>
+            Cancel
+          </Button>
+          <Button onClick={async () => {
+            if (!paymentData.businessId || !paymentData.amount || !paymentData.paymentMethod) {
+              toast.error("Please fill in all required fields")
+              return
+            }
+
+            try {
+              const { success, error } = await superAdminService.verifyPayment({
+                business_id: paymentData.businessId,
+                amount: parseFloat(paymentData.amount),
+                payment_type: parseFloat(paymentData.amount) >= 1000 ? 'upfront' : 'maintenance',
+                payment_method: paymentData.paymentMethod,
+                notes: paymentData.notes || undefined
               })
-            }}>
-              Cancel
-            </Button>
-            <Button onClick={async () => {
-              if (!paymentData.businessId || !paymentData.amount || !paymentData.paymentMethod) {
-                toast.error("Please fill in all required fields")
-                return
-              }
 
-              try {
-                const { success, error } = await superAdminService.verifyPayment({
-                  business_id: paymentData.businessId,
-                  amount: parseFloat(paymentData.amount),
-                  payment_type: parseFloat(paymentData.amount) >= 1000 ? 'upfront' : 'maintenance',
-                  payment_method: paymentData.paymentMethod,
-                  notes: paymentData.notes || undefined
+              if (success) {
+                toast.success("Payment verified successfully!")
+                setShowPaymentDialog(false)
+                setPaymentData({
+                  businessId: "",
+                  amount: "",
+                  paymentMethod: "",
+                  reference: "",
+                  notes: ""
                 })
-
-                if (success) {
-                  toast.success("Payment verified successfully!")
-                  setShowPaymentDialog(false)
-                  setPaymentData({
-                    businessId: "",
-                    amount: "",
-                    paymentMethod: "",
-                    reference: "",
-                    notes: ""
-                  })
-                  loadBusinesses() // Reload to see updated status
-                } else {
-                  toast.error(error || "Failed to verify payment")
-                }
-              } catch (error: any) {
-                toast.error(`Error: ${error.message}`)
+                loadBusinesses() // Reload to see updated status
+              } else {
+                toast.error(error || "Failed to verify payment")
               }
-            }}>
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Verify Payment
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  )
+            } catch (error: any) {
+              toast.error(`Error: ${error.message}`)
+            }
+          }}>
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Verify Payment
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </div>
+)
 }

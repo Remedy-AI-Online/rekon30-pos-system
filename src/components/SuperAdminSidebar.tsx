@@ -17,6 +17,7 @@ interface SuperAdminSidebarProps {
   onSelect: (tab: string) => void
   user?: { name?: string; role?: string } | null
   onLogout?: () => void
+  onNavigate?: () => void
 }
 
 const menuItems = [
@@ -30,7 +31,7 @@ const menuItems = [
   { id: "settings", label: "Settings", icon: Settings },
 ]
 
-export function SuperAdminSidebar({ activeTab, onSelect, user, onLogout }: SuperAdminSidebarProps) {
+export function SuperAdminSidebar({ activeTab, onSelect, user, onLogout, onNavigate }: SuperAdminSidebarProps) {
   return (
     <div className="w-64 bg-card border-r border-border flex flex-col h-full">
       <div className="p-6 border-b border-border">
@@ -52,7 +53,10 @@ export function SuperAdminSidebar({ activeTab, onSelect, user, onLogout }: Super
             return (
               <li key={item.id}>
                 <button
-                  onClick={() => onSelect(item.id)}
+                  onClick={() => {
+                    onSelect(item.id)
+                    onNavigate?.()
+                  }}
                   className={cn(
                     "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-left",
                     activeTab === item.id
