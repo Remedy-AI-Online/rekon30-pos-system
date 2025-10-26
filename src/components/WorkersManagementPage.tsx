@@ -49,6 +49,7 @@ interface Cashier {
   lastLogin: string | null
   loginCount: number
   createdAt: string
+  cashierId?: string
 }
 
 export function WorkersManagementPage() {
@@ -262,8 +263,11 @@ export function WorkersManagementPage() {
         setCredentialsDialog({
           open: true,
           credentials: {
-            ...cashiers.find(c => c.id === cashierId),
-            password: data.newPassword
+            cashierId: cashierId,
+            shopId: cashiers.find(c => c.id === cashierId)?.shopId || '',
+            shopName: cashiers.find(c => c.id === cashierId)?.shopName || '',
+            password: data.newPassword,
+            email: cashiers.find(c => c.id === cashierId)?.email || ''
           }
         })
         loadCashiers()
@@ -530,7 +534,7 @@ export function WorkersManagementPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => setCredentialsDialog({ open: true, credentials: cashier })}
+                              onClick={() => setCredentialsDialog({ open: true, credentials: { ...cashier, cashierId: cashier.id } })}
                               title="View Credentials"
                             >
                               <Key className="h-3 w-3" />
@@ -670,7 +674,7 @@ export function WorkersManagementPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => copyToClipboard(credentialsDialog.credentials.shopId, 'shopId')}
+                      onClick={() => copyToClipboard(credentialsDialog.credentials?.shopId || '', 'shopId')}
                     >
                       {copiedField === 'shopId' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
@@ -679,11 +683,11 @@ export function WorkersManagementPage() {
                 <div>
                   <Label className="text-xs text-muted-foreground">Cashier ID</Label>
                   <div className="flex items-center justify-between">
-                    <p className="font-mono text-sm">{credentialsDialog.credentials.cashierId || credentialsDialog.credentials.id}</p>
+                    <p className="font-mono text-sm">{credentialsDialog.credentials?.cashierId}</p>
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => copyToClipboard(credentialsDialog.credentials.cashierId || credentialsDialog.credentials.id, 'cashierId')}
+                      onClick={() => copyToClipboard(credentialsDialog.credentials?.cashierId || '', 'cashierId')}
                     >
                       {copiedField === 'cashierId' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
@@ -696,7 +700,7 @@ export function WorkersManagementPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => copyToClipboard(credentialsDialog.credentials.password, 'password')}
+                      onClick={() => copyToClipboard(credentialsDialog.credentials?.password || '', 'password')}
                     >
                       {copiedField === 'password' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
@@ -709,7 +713,7 @@ export function WorkersManagementPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => copyToClipboard(credentialsDialog.credentials.email, 'email')}
+                      onClick={() => copyToClipboard(credentialsDialog.credentials?.email || '', 'email')}
                     >
                       {copiedField === 'email' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>

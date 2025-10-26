@@ -277,7 +277,7 @@ export function PayrollPage() {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`
+            'Authorization': `Bearer ${getSupabaseClient().supabaseKey}`
           }
         }
       )

@@ -7,9 +7,10 @@ import { Receipt, User, DollarSign } from "lucide-react"
 interface CartItem {
   id: string
   name: string
-  size: string
   price: number
   quantity: number
+  originalPrice?: number
+  isBargained?: boolean
 }
 
 interface Customer {
@@ -125,7 +126,7 @@ export function SalesSection({ sales, onPrintReceipt }: SalesSectionProps) {
                       <div className="space-y-1">
                         {sale.items.map((item, idx) => (
                           <div key={idx} className="text-sm">
-                            {item.quantity}x {item.name} ({item.size})
+                            {item.quantity}x {item.name}
                           </div>
                         ))}
                       </div>

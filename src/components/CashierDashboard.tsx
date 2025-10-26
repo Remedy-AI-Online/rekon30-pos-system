@@ -19,9 +19,10 @@ interface CashierDashboardProps {
 interface CartItem {
   id: string
   name: string
-  size: string
   price: number
   quantity: number
+  originalPrice?: number
+  isBargained?: boolean
 }
 
 interface Customer {
@@ -153,7 +154,7 @@ export function CashierDashboard({ user, accessToken, onLogout, selectedFeatures
         <div class="items">
           ${sale.items.map(item => `
             <div class="item">
-              <div class="item-name">${item.name} (${item.size})</div>
+              <div class="item-name">${item.name}</div>
               <div class="item-details">
                 ${item.quantity} x GHS ${item.price.toFixed(2)} = GHS ${(item.quantity * item.price).toFixed(2)}
               </div>

@@ -19,9 +19,10 @@ import { Label } from "../ui/label"
 interface CartItem {
   id: string
   name: string
-  size: string
   price: number
   quantity: number
+  originalPrice?: number
+  isBargained?: boolean
 }
 
 interface Sale {
@@ -93,7 +94,7 @@ export function ReportsSection({ sales }: ReportsSectionProps) {
   // Product performance
   const productSales = filteredSales.reduce((acc, sale) => {
     sale.items.forEach(item => {
-      const key = `${item.name} (${item.size})`
+      const key = `${item.name}`
       if (!acc[key]) {
         acc[key] = { name: key, quantity: 0, revenue: 0 }
       }
