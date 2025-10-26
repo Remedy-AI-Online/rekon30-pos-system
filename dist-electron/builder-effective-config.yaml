@@ -1,0 +1,19 @@
+directories:
+  output: dist-electron
+  buildResources: build
+appId: com.rekon360.desktop
+productName: Rekon360
+files:
+  - filter:
+      - dist/**/*
+      - dist-electron/**/*
+win:
+  target: nsis
+  icon: assets/icon.ico
+mac:
+  target: dmg
+  icon: assets/icon.icns
+linux:
+  target: AppImage
+  icon: assets/icon.png
+electronVersion: 27.3.11

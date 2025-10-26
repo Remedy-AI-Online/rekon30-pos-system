@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Connection Test</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Supabase Connection Test</h1>
+    <div id="status">Testing connection...</div>
+    <button onclick="testLogin()">Test Login</button>
+    <div id="result"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://cddoboboxeangripcqrn.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTgyNTQsImV4cCI6MjA3NTMzNDI1NH0.JS5pdOsT8xocAIA9uPYnWsoE0FwChKJ1jfOIObJRpEo'
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        async function testConnection() {
+            try {
+                console.log('Testing Supabase connection...')
+                const { data, error } = await supabase.auth.getSession()
+                document.getElementById('status').innerHTML = 'Connection successful!'
+                console.log('Connection result:', { data, error })
+            } catch (err) {
+                document.getElementById('status').innerHTML = 'Connection failed: ' + err.message
+                console.error('Connection error:', err)
+            }
+        }
+
+        async function testLogin() {
+            try {
+                console.log('Testing login...')
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: 'dapaahsylvester5@gmail.com',
+                    password: 'password123'
+                })
+                
+                document.getElementById('result').innerHTML = `
+                    <h3>Login Result:</h3>
+                    <p>Success: ${!error}</p>
+                    <p>Error: ${error?.message || 'None'}</p>
+                    <p>User: ${data?.user?.email || 'None'}</p>
+                    <p>Role: ${data?.user?.user_metadata?.role || 'None'}</p>
+                `
+                console.log('Login result:', { data, error })
+            } catch (err) {
+                document.getElementById('result').innerHTML = 'Login failed: ' + err.message
+                console.error('Login error:', err)
+            }
+        }
+
+        // Test connection on load
+        testConnection()
+    </script>
+</body>
+</html>

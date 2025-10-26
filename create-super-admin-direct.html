@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Super Admin</title>
+</head>
+<body>
+    <h1>🚀 Creating Super Admin Account</h1>
+    <div id="status">Please wait...</div>
+    
+    <script>
+        async function createSuperAdmin() {
+            try {
+                console.log('🚀 Creating Super Admin account...')
+                
+                const response = await fetch(
+                    'https://cddoboboxeangripcqrn.supabase.co/functions/v1/make-server-86b98184/auth/create-admin',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTgyNTQsImV4cCI6MjA3NTMzNDI1NH0.JS5pdOsT8xocAIA9uPYnWsoE0FwChKJ1jfOIObJRpEo'
+                        },
+                        body: JSON.stringify({
+                            email: 'admin@rekon360.com',
+                            password: 'SuperAdmin123!',
+                            name: 'Rekon360 Owner',
+                            role: 'super_admin'
+                        })
+                    }
+                )
+                
+                const data = await response.json()
+                console.log('Response:', data)
+                
+                if (data.success) {
+                    document.getElementById('status').innerHTML = `
+                        <div style="color: green; font-size: 18px;">
+                            ✅ <strong>SUCCESS!</strong><br>
+                            Super Admin account created successfully!<br><br>
+                            📧 <strong>Email:</strong> admin@rekon360.com<br>
+                            🔑 <strong>Password:</strong> SuperAdmin123!<br><br>
+                            🚀 <strong>You can now login to your app!</strong>
+                        </div>
+                    `
+                } else {
+                    document.getElementById('status').innerHTML = `
+                        <div style="color: red; font-size: 18px;">
+                            ❌ <strong>ERROR:</strong> ${data.error}
+                        </div>
+                    `
+                }
+                
+            } catch (error) {
+                console.error('❌ Setup failed:', error)
+                document.getElementById('status').innerHTML = `
+                    <div style="color: red; font-size: 18px;">
+                        ❌ <strong>SETUP FAILED:</strong> ${error.message}
+                    </div>
+                `
+            }
+        }
+        
+        // Run the setup when page loads
+        createSuperAdmin()
+    </script>
+</body>
+</html>

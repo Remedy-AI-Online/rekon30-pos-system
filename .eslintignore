@@ -1,0 +1,11 @@
+# Ignore Edge Functions - they use Deno runtime and have different TypeScript rules
+supabase/functions/**/*.ts
+supabase/functions/**/*.js
+
+# Ignore build outputs
+dist/
+dist-electron/
+node_modules/
+
+# Ignore generated files
+*.d.ts

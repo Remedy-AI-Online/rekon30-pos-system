@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Force Super Admin Role</title>
+</head>
+<body>
+    <h1>🔧 Force Super Admin Role</h1>
+    <div id="status">Please wait...</div>
+    
+    <script>
+        async function forceSuperAdminRole() {
+            try {
+                console.log('🔧 Forcing Super Admin role...')
+                
+                // First, let's try to update the user metadata directly
+                const updateResponse = await fetch(
+                    'https://cddoboboxeangripcqrn.supabase.co/functions/v1/make-server-86b98184/auth/update-user-role',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTgyNTQsImV4cCI6MjA3NTMzNDI1NH0.JS5pdOsT8xocAIA9uPYnWsoE0FwChKJ1jfOIObJRpEo'
+                        },
+                        body: JSON.stringify({
+                            email: 'admin@rekon360.com',
+                            role: 'super_admin'
+                        })
+                    }
+                )
+                
+                const updateData = await updateResponse.json()
+                console.log('✅ Role update response:', updateData)
+                
+                if (updateData.success) {
+                    document.getElementById('status').innerHTML = `
+                        <div style="color: green; font-size: 18px;">
+                            ✅ <strong>SUPER ADMIN ROLE UPDATED!</strong><br><br>
+                            📧 <strong>Email:</strong> admin@rekon360.com<br>
+                            👤 <strong>New Role:</strong> ${updateData.user.role}<br><br>
+                            🚀 <strong>Now refresh your app and login again!</strong><br>
+                            <strong>The Super Admin Panel should appear!</strong>
+                        </div>
+                    `
+                } else {
+                    // If the update endpoint doesn't exist, try creating a new account
+                    document.getElementById('status').innerHTML = `
+                        <div style="color: orange; font-size: 18px;">
+                            ⚠️ <strong>UPDATE ENDPOINT NOT FOUND</strong><br>
+                            Trying alternative method...<br><br>
+                            <strong>Please try logging in with:</strong><br>
+                            📧 <strong>Email:</strong> admin@rekon360.com<br>
+                            🔑 <strong>Password:</strong> SuperAdmin123!<br><br>
+                            <strong>If it still shows 'admin' role, we need to fix the Edge Function.</strong>
+                        </div>
+                    `
+                }
+                
+            } catch (error) {
+                console.error('❌ Force role failed:', error)
+                document.getElementById('status').innerHTML = `
+                    <div style="color: red; font-size: 18px;">
+                        ❌ <strong>FORCE ROLE FAILED:</strong> ${error.message}<br><br>
+                        <strong>Manual Fix Required:</strong><br>
+                        1. Go to Supabase Dashboard<br>
+                        2. Go to Authentication → Users<br>
+                        3. Find admin@rekon360.com<br>
+                        4. Edit user metadata<br>
+                        5. Set role: "super_admin"
+                    </div>
+                `
+            }
+        }
+        
+        // Run the force when page loads
+        forceSuperAdminRole()
+    </script>
+</body>
+</html>

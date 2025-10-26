@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edge Function Test</title>
+</head>
+<body>
+    <h1>Edge Function Test</h1>
+    <div id="status">Testing edge function...</div>
+    <button onclick="testEdgeFunction()">Test Edge Function</button>
+    <div id="result"></div>
+
+    <script>
+        async function testEdgeFunction() {
+            // First test health endpoint
+            const healthUrl = 'https://cddoboboxeangripcqrn.supabase.co/functions/v1/make-server-86b98184/health'
+            const loginUrl = 'https://cddoboboxeangripcqrn.supabase.co/functions/v1/make-server-86b98184/cashiers/test123/login'
+            const apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTgyNTQsImV4cCI6MjA3NTMzNDI1NH0.JS5pdOsT8xocAIA9uPYnWsoE0FwChKJ1jfOIObJRpEo'
+            
+            try {
+                console.log('Testing health endpoint at:', healthUrl)
+                document.getElementById('status').innerHTML = 'Testing health endpoint...'
+                
+                // Test health first
+                const healthResponse = await fetch(healthUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    }
+                })
+                
+                console.log('Health response status:', healthResponse.status)
+                const healthResult = await healthResponse.text()
+                console.log('Health response body:', healthResult)
+                
+                if (healthResponse.ok) {
+                    document.getElementById('status').innerHTML = 'Health check passed, testing login endpoint...'
+                    
+                    // Now test login endpoint
+                    console.log('Testing login endpoint at:', loginUrl)
+                    const response = await fetch(loginUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        }
+                    })
+                    
+                    console.log('Login response status:', response.status)
+                    const result = await response.text()
+                    console.log('Login response body:', result)
+                    
+                    document.getElementById('result').innerHTML = `
+                        <h3>Edge Function Test Results:</h3>
+                        <h4>Health Check:</h4>
+                        <p>Status: ${healthResponse.status}</p>
+                        <p>Response: ${healthResult}</p>
+                        <h4>Login Endpoint:</h4>
+                        <p>Status: ${response.status}</p>
+                        <p>Status Text: ${response.statusText}</p>
+                        <p>Response: ${result}</p>
+                    `
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <h3>Health Check Failed:</h3>
+                        <p>Status: ${healthResponse.status}</p>
+                        <p>Response: ${healthResult}</p>
+                    `
+                }
+                
+            } catch (error) {
+                console.error('Edge function test failed:', error)
+                document.getElementById('result').innerHTML = `
+                    <h3>Edge Function Test Failed:</h3>
+                    <p>Error: ${error.message}</p>
+                    <p>Type: ${error.name}</p>
+                `
+            }
+        }
+    </script>
+</body>
+</html>

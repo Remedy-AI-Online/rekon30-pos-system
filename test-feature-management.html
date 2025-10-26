@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Feature Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Test Feature Management</h1>
+        
+        <div>
+            <label for="businessId">Business ID:</label>
+            <input type="text" id="businessId" placeholder="Enter business ID">
+            
+            <label for="featureId">Feature ID:</label>
+            <select id="featureId">
+                <option value="customers">Customer Management</option>
+                <option value="analytics">Advanced Analytics</option>
+                <option value="multi-location">Multi-Location</option>
+                <option value="api">API Access</option>
+                <option value="white-label">White Label</option>
+                <option value="priority-support">Priority Support</option>
+                <option value="custom-features">Custom Features</option>
+            </select>
+            
+            <button onclick="testEnableFeature()">➕ Enable Feature</button>
+            <button onclick="testDisableFeature()">➖ Disable Feature</button>
+            <button onclick="checkCurrentFeatures()">🔍 Check Current Features</button>
+            <button onclick="listAllBusinesses()">📋 List All Businesses</button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://cddoboboxeangripcqrn.supabase.co'
+        const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODM2MTAyMCwiZXhwIjoyMDQzOTM3MDIwfQ.vbfMPKYY4UrHLmFPn0USFN9B5w4vvNBhH4B4Pv7ddxE'
+
+        const { createClient } = window.supabase
+        const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
+
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result')
+            resultDiv.textContent = message
+            resultDiv.className = type
+        }
+
+        async function testEnableFeature() {
+            const businessId = document.getElementById('businessId').value
+            const featureId = document.getElementById('featureId').value
+
+            if (!businessId) {
+                showResult('❌ Please enter a business ID', 'error')
+                return
+            }
+
+            showResult('⏳ Enabling feature...', 'info')
+
+            try {
+                // 1. Get current features
+                const { data: business, error: fetchError } = await supabase
+                    .from('businesses')
+                    .select('features, business_name')
+                    .eq('id', businessId)
+                    .single()
+
+                if (fetchError) {
+                    showResult(`❌ Error fetching business: ${fetchError.message}`, 'error')
+                    return
+                }
+
+                const currentFeatures = business.features || []
+                
+                if (currentFeatures.includes(featureId)) {
+                    showResult(`ℹ️ Feature "${featureId}" is already enabled for ${business.business_name}`, 'info')
+                    return
+                }
+
+                // 2. Add feature
+                const updatedFeatures = [...currentFeatures, featureId]
+                
+                const { error: updateError } = await supabase
+                    .from('businesses')
+                    .update({ features: updatedFeatures })
+                    .eq('id', businessId)
+
+                if (updateError) {
+                    showResult(`❌ Error updating features: ${updateError.message}`, 'error')
+                    return
+                }
+
+                // 3. Update user metadata
+                const { data: { users }, error: userError } = await supabase.auth.admin.listUsers()
+                
+                if (!userError) {
+                    const businessUser = users.find(u => u.user_metadata?.business_id === businessId)
+                    
+                    if (businessUser) {
+                        await supabase.auth.admin.updateUserById(
+                            businessUser.id,
+                            {
+                                user_metadata: {
+                                    ...businessUser.user_metadata,
+                                    features: updatedFeatures
+                                }
+                            }
+                        )
+                    }
+                }
+
+                showResult(`✅ Feature "${featureId}" enabled successfully for ${business.business_name}!\n\nUpdated features: ${updatedFeatures.join(', ')}`, 'success')
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error')
+            }
+        }
+
+        async function testDisableFeature() {
+            const businessId = document.getElementById('businessId').value
+            const featureId = document.getElementById('featureId').value
+
+            if (!businessId) {
+                showResult('❌ Please enter a business ID', 'error')
+                return
+            }
+
+            showResult('⏳ Disabling feature...', 'info')
+
+            try {
+                // 1. Get current features
+                const { data: business, error: fetchError } = await supabase
+                    .from('businesses')
+                    .select('features, business_name')
+                    .eq('id', businessId)
+                    .single()
+
+                if (fetchError) {
+                    showResult(`❌ Error fetching business: ${fetchError.message}`, 'error')
+                    return
+                }
+
+                const currentFeatures = business.features || []
+                
+                if (!currentFeatures.includes(featureId)) {
+                    showResult(`ℹ️ Feature "${featureId}" is not enabled for ${business.business_name}`, 'info')
+                    return
+                }
+
+                // 2. Remove feature
+                const updatedFeatures = currentFeatures.filter(f => f !== featureId)
+                
+                const { error: updateError } = await supabase
+                    .from('businesses')
+                    .update({ features: updatedFeatures })
+                    .eq('id', businessId)
+
+                if (updateError) {
+                    showResult(`❌ Error updating features: ${updateError.message}`, 'error')
+                    return
+                }
+
+                // 3. Update user metadata
+                const { data: { users }, error: userError } = await supabase.auth.admin.listUsers()
+                
+                if (!userError) {
+                    const businessUser = users.find(u => u.user_metadata?.business_id === businessId)
+                    
+                    if (businessUser) {
+                        await supabase.auth.admin.updateUserById(
+                            businessUser.id,
+                            {
+                                user_metadata: {
+                                    ...businessUser.user_metadata,
+                                    features: updatedFeatures
+                                }
+                            }
+                        )
+                    }
+                }
+
+                showResult(`✅ Feature "${featureId}" disabled successfully for ${business.business_name}!\n\nRemaining features: ${updatedFeatures.join(', ') || 'None'}`, 'success')
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error')
+            }
+        }
+
+        async function checkCurrentFeatures() {
+            const businessId = document.getElementById('businessId').value
+
+            if (!businessId) {
+                showResult('❌ Please enter a business ID', 'error')
+                return
+            }
+
+            showResult('⏳ Checking features...', 'info')
+
+            try {
+                const { data: business, error } = await supabase
+                    .from('businesses')
+                    .select('business_name, plan, features')
+                    .eq('id', businessId)
+                    .single()
+
+                if (error) {
+                    showResult(`❌ Error: ${error.message}`, 'error')
+                    return
+                }
+
+                const features = business.features || []
+                showResult(`📊 Current Features for ${business.business_name}:\n\nPlan: ${business.plan}\nFeatures: ${features.join(', ') || 'None'}`, 'success')
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error')
+            }
+        }
+
+        async function listAllBusinesses() {
+            showResult('⏳ Loading businesses...', 'info')
+
+            try {
+                const { data: businesses, error } = await supabase
+                    .from('businesses')
+                    .select('id, business_name, plan, features')
+                    .order('created_at', { ascending: false })
+
+                if (error) {
+                    showResult(`❌ Error: ${error.message}`, 'error')
+                    return
+                }
+
+                if (!businesses || businesses.length === 0) {
+                    showResult('ℹ️ No businesses found', 'info')
+                    return
+                }
+
+                let result = '📋 All Businesses:\n\n'
+                businesses.forEach((b, i) => {
+                    result += `${i + 1}. ${b.business_name}\n`
+                    result += `   ID: ${b.id}\n`
+                    result += `   Plan: ${b.plan}\n`
+                    result += `   Features: ${(b.features || []).join(', ') || 'None'}\n\n`
+                })
+
+                showResult(result, 'success')
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error')
+            }
+        }
+
+        // Load businesses on page load
+        window.onload = listAllBusinesses
+    </script>
+</body>
+</html>
+

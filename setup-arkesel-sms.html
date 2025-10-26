@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Arkesel SMS - Rekon360</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 1.1em;
+    }
+    .step {
+      background: #f8f9fa;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+    }
+    .step-number {
+      background: #667eea;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .code-box {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      margin: 10px 0;
+    }
+    .success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .warning {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .info {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .btn {
+      background: #667eea;
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .btn-success {
+      background: #28a745;
+    }
+    .btn-success:hover {
+      background: #218838;
+    }
+    .credentials-box {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+    .credential-item {
+      margin: 10px 0;
+      padding: 10px;
+      background: white;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+    .credential-label {
+      font-weight: bold;
+      color: #667eea;
+      display: block;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📱 Setup Arkesel SMS Integration</h1>
+    <p class="subtitle">Connect your Arkesel account to send real SMS receipts</p>
+
+    <div class="credentials-box">
+      <h3>✅ Your Arkesel Credentials:</h3>
+      <div class="credential-item">
+        <span class="credential-label">API Key:</span>
+        <code>a2p6RlpOd1RrYkRaTU1NdFJKS3U</code>
+      </div>
+      <div class="credential-item">
+        <span class="credential-label">API Endpoint:</span>
+        <code>https://sms.arkesel.com/sms/api?action=send-sms</code>
+      </div>
+      <div class="credential-item">
+        <span class="credential-label">Sender ID:</span>
+        <code>Rekon360</code> (or your approved sender name)
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">1</span>
+      <strong>Add API Key to Supabase Secrets:</strong>
+      <p>We need to store your API key securely in Supabase (not in code).</p>
+
+      <div class="info">
+        <strong>📋 Copy this command:</strong>
+        <div class="code-box">npx supabase secrets set ARKESEL_API_KEY=a2p6RlpOd1RrYkRaTU1NdFJKS3U</div>
+      </div>
+
+      <p><strong>Run it in your terminal:</strong></p>
+      <ol>
+        <li>Open Command Prompt or PowerShell</li>
+        <li>Navigate to: <code>C:\Users\USER\Downloads\Rekon30</code></li>
+        <li>Paste and run the command above</li>
+        <li>This securely stores your API key</li>
+      </ol>
+
+      <button class="btn" onclick="copyCommand()">📋 Copy Command</button>
+      <div id="copySuccess" style="display: none;" class="success">
+        ✅ Command copied! Now paste it in your terminal.
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <strong>Backend Updated:</strong>
+      <p>The backend code has been updated with Arkesel SMS integration.</p>
+      <div class="success">
+        ✅ SMS sending function added to backend<br>
+        ✅ Proper error handling included<br>
+        ✅ Phone number formatting for Ghana (0XX or 233XX)<br>
+        ✅ Watermark included: "Powered by Rekon360"
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">3</span>
+      <strong>Test SMS:</strong>
+      <p>After setting the secret, test sending an SMS:</p>
+      <ol>
+        <li>Login as Cashier</li>
+        <li>Make a sale in POS</li>
+        <li>Click "SMS Receipt" button</li>
+        <li>Enter your phone number: <code>024XXXXXXX</code></li>
+        <li>Click "Send SMS"</li>
+        <li>Check your phone for the receipt!</li>
+      </ol>
+    </div>
+
+    <div class="warning">
+      <strong>⚠️ Important Notes:</strong>
+      <ul>
+        <li><strong>Sender ID:</strong> Make sure "Rekon360" is approved by Arkesel (or use your approved sender ID)</li>
+        <li><strong>Phone Format:</strong> Accepts both 0241234567 and 233241234567</li>
+        <li><strong>Cost:</strong> ~4 pesewas per SMS</li>
+        <li><strong>Character Limit:</strong> Keep receipts under 160 characters to save money (1 SMS unit)</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <span class="step-number">4</span>
+      <strong>Deploy Backend:</strong>
+      <p>After setting the secret, deploy the updated backend:</p>
+      <div class="code-box">npx supabase functions deploy make-server-86b98184</div>
+      <button class="btn btn-success" onclick="copyDeployCommand()">📋 Copy Deploy Command</button>
+      <div id="deploySuccess" style="display: none;" class="success">
+        ✅ Deploy command copied! Run it in your terminal.
+      </div>
+    </div>
+
+    <div class="info">
+      <h3>📊 SMS Message Format:</h3>
+      <p><strong>Example receipt SMS:</strong></p>
+      <div class="code-box">Milo 400g 2x GHS5=GHS10, Bread 1x GHS3=GHS3. Total: GHS13. Payment: CASH. Receipt#: RCP1234567890. Powered by Rekon360</div>
+      <p><strong>Character count:</strong> ~130 chars (fits in 1 SMS)</p>
+    </div>
+
+    <div class="success">
+      <h3>✅ What Happens After Setup:</h3>
+      <ul>
+        <li>🔐 API key stored securely in Supabase secrets</li>
+        <li>📱 Real SMS sent via Arkesel when cashier clicks "SMS Receipt"</li>
+        <li>💰 You're charged per SMS (~4 pesewas)</li>
+        <li>✉️ Customer receives receipt instantly</li>
+        <li>🎨 Includes "Powered by Rekon360" watermark</li>
+      </ul>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+      <p style="color: #666;">Need help? Check <strong>ARKESEL_SMS_INTEGRATION.md</strong> for troubleshooting!</p>
+    </div>
+  </div>
+
+  <script>
+    function copyCommand() {
+      const command = 'npx supabase secrets set ARKESEL_API_KEY=a2p6RlpOd1RrYkRaTU1NdFJKS3U';
+      navigator.clipboard.writeText(command).then(() => {
+        document.getElementById('copySuccess').style.display = 'block';
+        setTimeout(() => {
+          document.getElementById('copySuccess').style.display = 'none';
+        }, 3000);
+      });
+    }
+
+    function copyDeployCommand() {
+      const command = 'npx supabase functions deploy make-server-86b98184';
+      navigator.clipboard.writeText(command).then(() => {
+        document.getElementById('deploySuccess').style.display = 'block';
+        setTimeout(() => {
+          document.getElementById('deploySuccess').style.display = 'none';
+        }, 3000);
+      });
+    }
+  </script>
+</body>
+</html>

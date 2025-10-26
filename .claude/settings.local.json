@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx supabase:*)",
+      "Bash(npx tsc:*)",
+      "Bash(dir:*)",
+      "Bash(curl:*)",
+      "Bash(npm run dev:*)",
+      "Bash(where:*)",
+      "Bash(supabase status:*)",
+      "Bash(start clear-all-data-now.html)",
+      "Bash(supabase functions deploy:*)",
+      "Bash(supabase db push:*)",
+      "Bash(start add-business-id-column.html)",
+      "Bash(start notepad \"C:\\Users\\USER\\Downloads\\Rekon30\\update-products-multi-tenant.sql\")",
+      "Bash(start setup-everything-now.html)",
+      "Bash(start \"C:\\Users\\USER\\Downloads\\Rekon30\\ISSUES_AND_FIXES.md\")",
+      "Bash(start \"C:\\Users\\USER\\Downloads\\Rekon30\\ARKESEL_SMS_INTEGRATION.md\")",
+      "Bash(start \"C:\\Users\\USER\\Downloads\\Rekon30\\WHATS_NEXT_FOR_REKON360.md\")",
+      "Bash(start \"C:\\Users\\USER\\Downloads\\Rekon30\\setup-credit-sales-system.html\")",
+      "Bash(start \"C:\\Users\\USER\\Downloads\\Rekon30\\CREDIT_SALES_IMPLEMENTATION_SUMMARY.md\")",
+      "Bash(start \"C:\\Users\\USER\\Downloads\\Rekon30\\verify-credit-sales-setup.html\")",
+      "Bash(start \"C:\\Users\\USER\\Downloads\\Rekon30\\setup-arkesel-sms.html\")",
+      "Bash(start \"C:\\Users\\USER\\Downloads\\Rekon30\\FIXES_APPLIED.md\")",
+      "Bash(findstr:*)",
+      "Bash(start \"C:\\Users\\USER\\Downloads\\Rekon30\\CREDIT_SALES_FIXED.md\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

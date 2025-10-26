@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Credit Sales Setup - Rekon360</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .status-box {
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 10px;
+      border-left: 4px solid #ccc;
+    }
+    .status-pending {
+      background: #f8f9fa;
+      border-left-color: #6c757d;
+    }
+    .status-checking {
+      background: #fff3cd;
+      border-left-color: #ffc107;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .status-success {
+      background: #d4edda;
+      border-left-color: #28a745;
+    }
+    .status-error {
+      background: #f8d7da;
+      border-left-color: #dc3545;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .btn {
+      background: #667eea;
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .table-info {
+      margin: 10px 0;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    .success-icon {
+      color: #28a745;
+      font-size: 24px;
+      margin-right: 10px;
+    }
+    .error-icon {
+      color: #dc3545;
+      font-size: 24px;
+      margin-right: 10px;
+    }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0,0,0,.1);
+      border-radius: 50%;
+      border-top-color: #667eea;
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Credit Sales Setup Verification</h1>
+    <p class="subtitle">Checking if credit sales tables are properly set up...</p>
+
+    <div id="status" class="status-box status-pending">
+      <strong>Status:</strong> Ready to check
+      <p>Click the button below to verify your setup.</p>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+      <button id="checkBtn" class="btn">🚀 Check Setup Now</button>
+    </div>
+
+    <div id="results" style="display: none;">
+      <h3>Verification Results:</h3>
+
+      <div id="customersTable" class="status-box status-pending">
+        <strong>📋 customers table:</strong>
+        <span id="customersStatus">Checking...</span>
+        <div id="customersDetails" class="table-info" style="display: none;"></div>
+      </div>
+
+      <div id="creditSalesTable" class="status-box status-pending">
+        <strong>💳 credit_sales table:</strong>
+        <span id="creditSalesStatus">Checking...</span>
+        <div id="creditSalesDetails" class="table-info" style="display: none;"></div>
+      </div>
+
+      <div id="creditPaymentsTable" class="status-box status-pending">
+        <strong>💰 credit_payments table:</strong>
+        <span id="creditPaymentsStatus">Checking...</span>
+        <div id="creditPaymentsDetails" class="table-info" style="display: none;"></div>
+      </div>
+    </div>
+
+    <div id="finalStatus" style="display: none; margin-top: 30px;"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://cddoboboxeangripcqrn.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczNzIzNjYsImV4cCI6MjA1Mjk0ODM2Nn0.QVEop2yBbpN_5hQAuzl8SJcYOSQfHPQ8lAm7TnAJI14'
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    let allTablesExist = true
+
+    async function checkTable(tableName, statusId, detailsId) {
+      const statusElement = document.getElementById(statusId)
+      const detailsElement = document.getElementById(detailsId)
+      const tableBox = document.getElementById(tableName + 'Table')
+
+      try {
+        tableBox.className = 'status-box status-checking'
+        statusElement.innerHTML = '<span class="spinner"></span> Checking...'
+
+        // Try to query the table
+        const { data, error, count } = await supabase
+          .from(tableName)
+          .select('*', { count: 'exact', head: true })
+
+        if (error) {
+          // Table doesn't exist or has permission issues
+          console.error(`Error checking ${tableName}:`, error)
+          tableBox.className = 'status-box status-error'
+          statusElement.innerHTML = '<span class="error-icon">✗</span> Table not found or not accessible'
+          detailsElement.style.display = 'block'
+          detailsElement.innerHTML = `Error: ${error.message || 'Table does not exist'}`
+          allTablesExist = false
+          return false
+        } else {
+          // Table exists
+          tableBox.className = 'status-box status-success'
+          statusElement.innerHTML = '<span class="success-icon">✓</span> Table exists and is accessible'
+          detailsElement.style.display = 'block'
+          detailsElement.innerHTML = `Row count: ${count || 0} (empty is OK for new setup)`
+          return true
+        }
+      } catch (error) {
+        console.error(`Exception checking ${tableName}:`, error)
+        tableBox.className = 'status-box status-error'
+        statusElement.innerHTML = '<span class="error-icon">✗</span> Error during check'
+        detailsElement.style.display = 'block'
+        detailsElement.innerHTML = `Error: ${error.message}`
+        allTablesExist = false
+        return false
+      }
+    }
+
+    async function verifySetup() {
+      const statusDiv = document.getElementById('status')
+      const resultsDiv = document.getElementById('results')
+      const finalStatusDiv = document.getElementById('finalStatus')
+      const checkBtn = document.getElementById('checkBtn')
+
+      // Update status
+      statusDiv.className = 'status-box status-checking'
+      statusDiv.innerHTML = '<strong>Status:</strong> <span class="spinner"></span> Checking tables...'
+
+      // Disable button
+      checkBtn.disabled = true
+
+      // Show results section
+      resultsDiv.style.display = 'block'
+
+      // Reset flag
+      allTablesExist = true
+
+      // Check each table
+      await checkTable('customers', 'customersStatus', 'customersDetails')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Small delay for UX
+
+      await checkTable('credit_sales', 'creditSalesStatus', 'creditSalesDetails')
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      await checkTable('credit_payments', 'creditPaymentsStatus', 'creditPaymentsDetails')
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Show final status
+      finalStatusDiv.style.display = 'block'
+
+      if (allTablesExist) {
+        statusDiv.className = 'status-box status-success'
+        statusDiv.innerHTML = '<strong>Status:</strong> <span class="success-icon">✓</span> All checks passed! Setup is complete.'
+
+        finalStatusDiv.className = 'status-box status-success'
+        finalStatusDiv.innerHTML = `
+          <h3><span class="success-icon">✓</span> Success! Credit Sales System is Ready</h3>
+          <p><strong>All 3 tables are properly set up:</strong></p>
+          <ul>
+            <li>✅ customers table - Stores credit customers</li>
+            <li>✅ credit_sales table - Tracks credit transactions</li>
+            <li>✅ credit_payments table - Records payments</li>
+          </ul>
+          <p><strong>Next Steps:</strong></p>
+          <ol>
+            <li>Login as Admin</li>
+            <li>Go to "Credit Sales (Book)" in the menu</li>
+            <li>Add your first credit customer</li>
+            <li>Test recording a credit sale</li>
+          </ol>
+          <p style="margin-top: 20px;">
+            <a href="http://localhost:5173" style="color: #667eea; text-decoration: none; font-weight: bold;">
+              🚀 Go to Rekon360 App →
+            </a>
+          </p>
+        `
+      } else {
+        statusDiv.className = 'status-box status-error'
+        statusDiv.innerHTML = '<strong>Status:</strong> <span class="error-icon">✗</span> Setup incomplete - some tables are missing'
+
+        finalStatusDiv.className = 'status-box status-error'
+        finalStatusDiv.innerHTML = `
+          <h3><span class="error-icon">✗</span> Setup Incomplete</h3>
+          <p><strong>Some tables are missing or not accessible.</strong></p>
+          <p><strong>To fix this:</strong></p>
+          <ol>
+            <li>Open <code>setup-credit-sales-system.html</code></li>
+            <li>Copy the SQL code</li>
+            <li>Go to <a href="https://supabase.com/dashboard/project/cddoboboxeangripcqrn/editor" target="_blank" style="color: #667eea;">Supabase SQL Editor</a></li>
+            <li>Paste and run the SQL</li>
+            <li>Come back here and click "Check Setup Now" again</li>
+          </ol>
+        `
+      }
+
+      // Re-enable button
+      checkBtn.disabled = false
+      checkBtn.textContent = '🔄 Check Again'
+    }
+
+    document.getElementById('checkBtn').addEventListener('click', verifySetup)
+
+    // Auto-run check on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('checkBtn').click()
+      }, 500)
+    })
+  </script>
+</body>
+</html>

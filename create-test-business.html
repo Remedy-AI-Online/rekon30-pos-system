@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Test Business</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; border-left: 4px solid #28a745; }
+        .error { background: #f8d7da; border-left: 4px solid #dc3545; }
+        .info { background: #d1ecf1; border-left: 4px solid #17a2b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 Create Test Business Account</h1>
+        <p>This will help you create a test business account for multi-tenancy testing.</p>
+        
+        <form id="businessForm">
+            <div class="form-group">
+                <label for="businessName">Business Name:</label>
+                <input type="text" id="businessName" value="Test Business" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" value="test@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" value="testpassword123" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="businessType">Business Type:</label>
+                <select id="businessType">
+                    <option value="retail">Retail</option>
+                    <option value="restaurant">Restaurant</option>
+                    <option value="service">Service</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="plan">Plan:</label>
+                <select id="plan">
+                    <option value="basic">Basic</option>
+                    <option value="pro">Pro</option>
+                    <option value="enterprise">Enterprise</option>
+                </select>
+            </div>
+            
+            <button type="submit">🚀 Create Test Business</button>
+        </form>
+        
+        <div id="result"></div>
+        
+        <div class="info">
+            <h3>📋 After Creating the Business:</h3>
+            <ol>
+                <li>Go to your Rekon30 app</li>
+                <li>Log in with the email and password you just created</li>
+                <li>Go back to the multi-tenancy test page</li>
+                <li>Run the tests again</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://cddoboboxeangripcqrn.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTgyNTQsImV4cCI6MjA3NTMzNDI1NH0.JS5pdOsT8xocAIA9uPYnWsoE0FwChKJ1jfOIObJRpEo'
+        
+        const { createClient } = window.supabase
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        document.getElementById('businessForm').addEventListener('submit', async (e) => {
+            e.preventDefault()
+            
+            const resultDiv = document.getElementById('result')
+            resultDiv.innerHTML = '<div class="info">🔄 Creating test business...</div>'
+            
+            try {
+                const businessName = document.getElementById('businessName').value
+                const email = document.getElementById('email').value
+                const password = document.getElementById('password').value
+                const businessType = document.getElementById('businessType').value
+                const plan = document.getElementById('plan').value
+                
+                // Create business signup request
+                const signupData = {
+                    email: email,
+                    password: password,
+                    business_config: {
+                        business_name: businessName,
+                        business_type: businessType,
+                        business_description: 'Test business for multi-tenancy testing',
+                        location_count: 1,
+                        number_of_employees: 5
+                    }
+                }
+                
+                console.log('Creating business signup request:', signupData)
+                
+                const response = await fetch('https://cddoboboxeangripcqrn.supabase.co/functions/v1/business-signup-requests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify(signupData)
+                })
+                
+                const result = await response.json()
+                console.log('Signup response:', result)
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Business Signup Request Created!</h3>
+                            <p><strong>Business Name:</strong> ${businessName}</p>
+                            <p><strong>Email:</strong> ${email}</p>
+                            <p><strong>Password:</strong> ${password}</p>
+                            <p><strong>Plan:</strong> ${plan}</p>
+                            <p><strong>Request ID:</strong> ${result.request_id}</p>
+                            
+                            <h4>📋 Next Steps:</h4>
+                            <ol>
+                                <li>Go to your Rekon30 app as Super Admin</li>
+                                <li>Approve this business signup request</li>
+                                <li>Assign the ${plan} plan</li>
+                                <li>Log in with the credentials above</li>
+                                <li>Test multi-tenancy</li>
+                            </ol>
+                        </div>
+                    `
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${result.error || 'Unknown error'}`)
+                }
+                
+            } catch (err) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Failed to Create Business</h3>
+                        <p>Error: ${err.message}</p>
+                        <p>You may need to create the business manually through the Super Admin panel.</p>
+                    </div>
+                `
+            }
+        })
+    </script>
+</body>
+</html>

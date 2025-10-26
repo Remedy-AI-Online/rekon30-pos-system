@@ -1,0 +1,64 @@
+  const generateRangeReportCSV = () => {
+    if (!reportData) return
+
+    const csvLines: string[] = []
+    
+    // Title and period
+    csvLines.push("CUSTOM RANGE SALES REPORT")
+    csvLines.push("")
+    csvLines.push(`Period:,${format(dateRange.from!, "MMM dd yyyy")} - ${format(dateRange.to!, "MMM dd yyyy")}`)
+    csvLines.push(`Generated:,${format(new Date(), "MMM dd yyyy HH:mm")}`)
+    csvLines.push("")
+    
+    // Summary section
+    csvLines.push("SUMMARY")
+    csvLines.push(`Total Transactions:,${reportData.totalTransactions}`)
+    csvLines.push(`Total Sales Amount:,$${reportData.totalAmount.toFixed(2)}`)
+    csvLines.push(`Average Transaction:,$${(reportData.totalAmount / reportData.totalTransactions).toFixed(2)}`)
+    csvLines.push("")
+    csvLines.push("")
+    
+    // Transaction details header
+    csvLines.push("TRANSACTION DETAILS")
+    csvLines.push("Date & Time,Receipt ID,Customer Name,Customer Phone,Items,Payment Method,Amount")
+    
+    // Transaction rows
+    reportData.allSales.forEach((sale: any) => {
+      const dateTime = format(new Date(sale.timestamp), "MMM dd yyyy HH:mm")
+      const items = sale.items.map((item: any) => `${item.name} (${item.size}) x${item.quantity}`).join('; ')
+      
+      csvLines.push([
+        dateTime,
+        sale.receiptId || sale.id,
+        sale.customer?.name || 'Walk-in',
+        sale.customer?.phone || 'N/A',
+        `"${items}"`,
+        sale.paymentMethod,
+        `$${sale.total.toFixed(2)}`
+      ].join(','))
+    })
+    
+    // Daily breakdown
+    csvLines.push("")
+    csvLines.push("")
+    csvLines.push("DAILY BREAKDOWN")
+    csvLines.push("Date,Transactions,Total Sales")
+    reportData.dailyBreakdown.forEach((day: any) => {
+      csvLines.push([
+        format(new Date(day.date), "MMM dd yyyy"),
+        day.totalTransactions,
+        `$${day.totalAmount.toFixed(2)}`
+      ].join(','))
+    })
+    
+    const csvContent = csvLines.join('\r\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `custom-sales-report-${format(dateRange.from!, "yyyy-MM-dd")}-to-${format(dateRange.to!, "yyyy-MM-dd")}.csv`
+    link.click()
+    window.URL.revokeObjectURL(url)
+    
+    toast.success("Custom range report downloaded successfully")
+  }

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear All Data - Rekon360</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #e74c3c;
+            margin-top: 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .warning h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #0c5460;
+        }
+        button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #c0392b;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            display: none;
+        }
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .log-success {
+            color: #28a745;
+        }
+        .log-error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .log-info {
+            color: #17a2b8;
+        }
+        .credentials {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .checkbox-container {
+            margin: 20px 0;
+        }
+        .checkbox-container label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚠️ Clear All Data</h1>
+
+        <div class="warning">
+            <h3>⚠️ WARNING: This action cannot be undone!</h3>
+            <p><strong>This will permanently delete:</strong></p>
+            <ul>
+                <li>All users (admins and cashiers) - except super admin</li>
+                <li>All businesses</li>
+                <li>All products and inventory</li>
+                <li>All customers</li>
+                <li>All workers/employees</li>
+                <li>All sales transactions</li>
+                <li>All payments</li>
+                <li>All cashier records</li>
+                <li>All payroll records</li>
+                <li>All corrections</li>
+                <li>All backup records</li>
+                <li>All API keys</li>
+                <li>All custom features</li>
+                <li>All business feature logs</li>
+                <li>All KV store data</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h3>✅ What will be preserved:</h3>
+            <ul>
+                <li>Super Admin account (superadmin@rekon360.com)</li>
+                <li>Database structure and schema</li>
+                <li>All tables (empty, but structure intact)</li>
+                <li>Functions and policies</li>
+            </ul>
+        </div>
+
+        <div class="credentials">
+            <h3>🔑 Authentication</h3>
+            <p>Service Role Key (pre-filled from your configuration):</p>
+            <input type="password" id="serviceKey" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTc1ODI1NCwiZXhwIjoyMDc1MzM0MjU0fQ.CbCMnclEfF2iWZzLeI4VGIgKYEPuYAt7P-kSAfPr83Q">
+            <small style="color: #666;">✓ Using service role key from your project configuration</small>
+        </div>
+
+        <div class="checkbox-container">
+            <label>
+                <input type="checkbox" id="confirmCheckbox">
+                <span>I understand this will permanently delete all data except super admin</span>
+            </label>
+        </div>
+
+        <button id="clearBtn" disabled onclick="clearAllData()">🗑️ Clear All Data</button>
+        <button onclick="location.reload()">🔄 Reset</button>
+
+        <div id="log"></div>
+    </div>
+
+    <script>
+        const projectId = 'cddoboboxeangripcqrn';
+        const supabaseUrl = `https://${projectId}.supabase.co`;
+
+        // Enable button only when both service key and checkbox are filled
+        document.getElementById('serviceKey').addEventListener('input', checkEnableButton);
+        document.getElementById('confirmCheckbox').addEventListener('change', checkEnableButton);
+
+        function checkEnableButton() {
+            const serviceKey = document.getElementById('serviceKey').value.trim();
+            const confirmed = document.getElementById('confirmCheckbox').checked;
+            document.getElementById('clearBtn').disabled = !(serviceKey && confirmed);
+        }
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            logDiv.style.display = 'block';
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function clearAllData() {
+            const serviceKey = document.getElementById('serviceKey').value.trim();
+
+            if (!serviceKey) {
+                alert('Please enter your Service Role Key');
+                return;
+            }
+
+            const confirmed = confirm(
+                '⚠️ FINAL WARNING ⚠️\n\n' +
+                'This will permanently delete ALL data from your database.\n\n' +
+                'Are you absolutely sure you want to proceed?'
+            );
+
+            if (!confirmed) {
+                log('Operation cancelled by user', 'info');
+                return;
+            }
+
+            // Disable button during operation
+            document.getElementById('clearBtn').disabled = true;
+
+            try {
+                log('Initializing Supabase client...', 'info');
+                const supabase = window.supabase.createClient(supabaseUrl, serviceKey);
+
+                // Step 1: Clear auth users (except super admin)
+                log('Step 1: Clearing auth users (except super admin)...', 'info');
+                try {
+                    const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
+
+                    if (listError) {
+                        log(`Could not list users: ${listError.message}`, 'error');
+                    } else {
+                        let deletedCount = 0;
+                        for (const user of users) {
+                            const role = user.user_metadata?.role;
+                            const email = user.email;
+
+                            // Delete if admin or cashier, or not super admin email
+                            if ((role === 'admin' || role === 'cashier') || email !== 'superadmin@rekon360.com') {
+                                const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id);
+                                if (!deleteError) {
+                                    deletedCount++;
+                                    log(`  ✓ Deleted user: ${email} (${role || 'no role'})`, 'success');
+                                }
+                            }
+                        }
+                        log(`✓ Auth cleanup complete: ${deletedCount} users deleted`, 'success');
+                    }
+                } catch (authError) {
+                    log(`Auth cleanup error: ${authError.message}`, 'error');
+                }
+
+                // Step 2: Clear all tables (in order respecting foreign key constraints)
+                const tables = [
+                    'business_signup_requests',
+                    'business_feature_log',
+                    'backup_records',
+                    'corrections',
+                    'payroll',
+                    'sales',
+                    'cashiers',
+                    'workers',
+                    'customers',
+                    'products',
+                    'payments',  // Must be deleted before businesses
+                    'businesses',
+                    'api_keys',
+                    'custom_features'
+                ];
+
+                log(`Step 2: Clearing ${tables.length} data tables...`, 'info');
+
+                for (const table of tables) {
+                    try {
+                        log(`  Clearing ${table}...`, 'info');
+                        const { error } = await supabase.from(table).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
+                        if (error) {
+                            log(`  ⚠️ Error clearing ${table}: ${error.message}`, 'error');
+                        } else {
+                            log(`  ✓ ${table} cleared`, 'success');
+                        }
+                    } catch (err) {
+                        log(`  ⚠️ Error clearing ${table}: ${err.message}`, 'error');
+                    }
+                }
+
+                // Clear kv_store separately (has different structure)
+                try {
+                    log(`  Clearing kv_store_86b98184...`, 'info');
+                    const { error } = await supabase.from('kv_store_86b98184').delete().neq('key', '__nonexistent__');
+                    if (error) {
+                        log(`  ⚠️ Error clearing kv_store_86b98184: ${error.message}`, 'error');
+                    } else {
+                        log(`  ✓ kv_store_86b98184 cleared`, 'success');
+                    }
+                } catch (err) {
+                    log(`  ⚠️ Error clearing kv_store_86b98184: ${err.message}`, 'error');
+                }
+
+                // Verify counts
+                log('Step 3: Verifying cleanup...', 'info');
+
+                for (const table of ['businesses', 'products', 'customers', 'workers', 'sales']) {
+                    try {
+                        const { count, error } = await supabase
+                            .from(table)
+                            .select('*', { count: 'exact', head: true });
+
+                        if (!error) {
+                            log(`  ${table}: ${count} records remaining`, count === 0 ? 'success' : 'info');
+                        }
+                    } catch (err) {
+                        log(`  Could not verify ${table}`, 'info');
+                    }
+                }
+
+                log('✅ DATA CLEANUP COMPLETE!', 'success');
+                log('', 'info');
+                log('Your database is now clean with:', 'success');
+                log('  ✓ Super admin preserved', 'success');
+                log('  ✓ Database structure intact', 'success');
+                log('  ✓ All data cleared', 'success');
+                log('', 'info');
+                log('You can now:', 'info');
+                log('  • Create new businesses', 'info');
+                log('  • Add new users', 'info');
+                log('  • Start fresh with clean data', 'info');
+
+            } catch (error) {
+                log(`FATAL ERROR: ${error.message}`, 'error');
+                console.error('Detailed error:', error);
+            } finally {
+                // Re-enable button
+                document.getElementById('clearBtn').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

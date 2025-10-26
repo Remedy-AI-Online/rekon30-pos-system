@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix LatexFoam Data NOW</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .sql-code { 
+            background: #f4f4f4; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+        }
+        .instructions { 
+            background: #e7f3ff; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .copy-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .copy-btn:hover { background: #45a049; }
+        .urgent { 
+            background: #fff3cd; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚨 Fix LatexFoam Data NOW</h1>
+    
+    <div class="urgent">
+        <h3>⚠️ URGENT: LatexFoam still shows wrong data!</h3>
+        <ul>
+            <li>❌ Revenue shows ₵0 (should be ₵3400)</li>
+            <li>❌ Red X icon (should be green checkmark)</li>
+            <li>❌ Missing database columns</li>
+        </ul>
+    </div>
+
+    <div class="instructions">
+        <h3>📋 Quick Fix Steps:</h3>
+        <ol>
+            <li>Go to <strong>Supabase Dashboard</strong></li>
+            <li>Click <strong>SQL Editor</strong></li>
+            <li>Copy and paste the SQL commands below</li>
+            <li>Click <strong>Run</strong></li>
+            <li>Refresh your app - data will be fixed!</li>
+        </ol>
+    </div>
+
+    <h3>SQL Commands to Run:</h3>
+    <div class="sql-code" id="sqlCode">-- Fix LatexFoam data in Supabase
+-- Run these commands in Supabase Dashboard → SQL Editor
+
+-- 1. Add missing columns
+ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS monthly_revenue DECIMAL(10,2) DEFAULT 0;
+ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS setup_complete BOOLEAN DEFAULT false;
+
+-- 2. Update LatexFoam data
+UPDATE public.businesses 
+SET 
+  monthly_revenue = 3400,
+  setup_complete = true,
+  payment_status = 'paid',
+  upfront_fee_paid = true,
+  maintenance_fee_paid = true,
+  last_payment_date = NOW()
+WHERE business_name = 'LatexFoam';
+
+-- 3. Verify the update
+SELECT business_name, monthly_revenue, setup_complete, payment_status, upfront_fee_paid, maintenance_fee_paid 
+FROM public.businesses 
+WHERE business_name = 'LatexFoam';</div>
+    <button class="copy-btn" onclick="copySQL()">📋 Copy SQL Commands</button>
+
+    <div style="margin-top: 20px; padding: 15px; background: #d4edda; border-radius: 5px; border-left: 4px solid #28a745;">
+        <h3>✅ After running these commands:</h3>
+        <ul>
+            <li>✅ Revenue will show ₵3400 instead of ₵0</li>
+            <li>✅ Red X icon will become green checkmark</li>
+            <li>✅ Payment status will show "paid"</li>
+            <li>✅ Both upfront and maintenance fees marked as paid</li>
+        </ul>
+    </div>
+
+    <div style="margin-top: 20px; padding: 15px; background: #f8d7da; border-radius: 5px; border-left: 4px solid #dc3545;">
+        <h3>🔥 Why this fixes everything:</h3>
+        <p><strong>Frontend code is already updated</strong> to use these columns. Once you add them to the database, the UI will automatically show the correct data!</p>
+    </div>
+
+    <script>
+        function copySQL() {
+            const sqlCode = document.getElementById('sqlCode').textContent;
+            navigator.clipboard.writeText(sqlCode).then(() => {
+                alert('SQL commands copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

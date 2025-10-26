@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Payment Column</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; border-left: 4px solid #28a745; }
+        .error { background: #f8d7da; border-left: 4px solid #dc3545; }
+        .info { background: #d1ecf1; border-left: 4px solid #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Payment History Column</h1>
+    <p>This will test if the payment_history column exists and is working.</p>
+    
+    <button onclick="testColumn()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+        🔍 Test Column
+    </button>
+    
+    <div id="result"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://cddoboboxeangripcqrn.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTgyNTQsImV4cCI6MjA3NTMzNDI1NH0.JS5pdOsT8xocAIA9uPYnWsoE0FwChKJ1jfOIObJRpEo'
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        async function testColumn() {
+            const resultDiv = document.getElementById('result')
+            resultDiv.innerHTML = '<div class="info">🔄 Testing payment_history column...</div>'
+            
+            try {
+                // Test 1: Check if column exists
+                console.log('Testing payment_history column...')
+                const { data, error } = await supabase
+                    .from('businesses')
+                    .select('id, business_name, payment_history')
+                    .limit(1)
+                
+                if (error) {
+                    if (error.message.includes('column') && error.message.includes('does not exist')) {
+                        resultDiv.innerHTML = `
+                            <div class="error">
+                                <h3>❌ Column Not Found</h3>
+                                <p>The payment_history column does not exist yet.</p>
+                                <p><strong>Solution:</strong> Run this SQL command in Supabase:</p>
+                                <code>ALTER TABLE public.businesses ADD COLUMN payment_history JSONB DEFAULT '[]'::jsonb;</code>
+                            </div>
+                        `
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="error">
+                                <h3>❌ Error</h3>
+                                <p>${error.message}</p>
+                            </div>
+                        `
+                    }
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Column Exists!</h3>
+                            <p>The payment_history column is working correctly.</p>
+                            <p>Sample data: ${JSON.stringify(data, null, 2)}</p>
+                            <p><strong>Payment recording should now work!</strong></p>
+                        </div>
+                    `
+                }
+                
+            } catch (err) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>💥 Test Failed</h3>
+                        <p>${err.message}</p>
+                    </div>
+                `
+            }
+        }
+    </script>
+</body>
+</html>

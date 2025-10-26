@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Deployment</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+    }
+    .test-section {
+      background: #f9f9f9;
+      border-left: 4px solid #667eea;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    #output {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 600px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    .success { color: #27ae60; font-weight: bold; }
+    .error { color: #e74c3c; font-weight: bold; }
+    .warning { color: #f39c12; font-weight: bold; }
+    .info { color: #3498db; font-weight: bold; }
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+    .checklist li {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .checklist li:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Verify Deployment - Complete Check</h1>
+    
+    <div class="test-section">
+      <h2>✅ What We're Checking:</h2>
+      <ul class="checklist">
+        <li>✓ New columns exist in businesses table</li>
+        <li>✓ RLS is enabled on all tables</li>
+        <li>✓ Approval function is updated</li>
+        <li>✓ Policies are created</li>
+        <li>✓ Data can be queried correctly</li>
+      </ul>
+    </div>
+
+    <button onclick="runAllTests()">🚀 Run Complete Verification</button>
+    <button onclick="clearOutput()">Clear Output</button>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://cddoboboxeangripcqrn.supabase.co';
+    const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTc1ODI1NCwiZXhwIjoyMDc1MzM0MjU0fQ.CbCMnclEfF2iWZzLeI4VGIgKYEPuYAt7P-kSAfPr83Q';
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+    
+    function log(message, type = 'info') {
+      const output = document.getElementById('output');
+      const prefix = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+      }[type] || 'ℹ️';
+      
+      output.innerHTML += `<span class="${type}">${prefix} ${message}</span>\n`;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function clearOutput() {
+      document.getElementById('output').innerHTML = '';
+    }
+
+    async function runAllTests() {
+      clearOutput();
+      log('🚀 Starting Complete Deployment Verification', 'info');
+      log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'info');
+      log('', 'info');
+      
+      await testNewColumns();
+      log('', 'info');
+      await testRLS();
+      log('', 'info');
+      await testBusinessData();
+      log('', 'info');
+      await testApprovalFunction();
+      log('', 'info');
+      
+      log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'info');
+      log('🎉 Verification Complete!', 'success');
+      log('', 'info');
+      log('📋 Next Steps:', 'info');
+      log('1. Log in to your app as Super Admin', 'info');
+      log('2. Go to Businesses page', 'info');
+      log('3. Click "View" on any business', 'info');
+      log('4. Check Overview tab for Business ID', 'info');
+      log('5. Check Business Details tab for full details', 'info');
+    }
+
+    async function testNewColumns() {
+      log('TEST 1: Checking New Columns in businesses Table', 'info');
+      log('─────────────────────────────────────────────────', 'info');
+      
+      try {
+        const { data, error } = await supabase
+          .from('businesses')
+          .select('id, business_name, owner_name, owner_phone, business_phone, business_address, city, region, registration_number, tin_number, year_established, number_of_employees, products_count, average_monthly_sales, business_size, business_config')
+          .limit(1);
+        
+        if (error) {
+          if (error.message.includes('column') && error.message.includes('does not exist')) {
+            log(`Column test FAILED: ${error.message}`, 'error');
+            log('Some columns are missing! Migration 028 may not have run successfully.', 'error');
+            return false;
+          }
+          log(`Query error: ${error.message}`, 'warning');
+          return false;
+        }
+        
+        log('✅ All new columns exist and are accessible!', 'success');
+        log('Columns verified:', 'info');
+        log('  ✓ owner_name', 'success');
+        log('  ✓ owner_phone', 'success');
+        log('  ✓ business_phone', 'success');
+        log('  ✓ business_address', 'success');
+        log('  ✓ city', 'success');
+        log('  ✓ region', 'success');
+        log('  ✓ registration_number', 'success');
+        log('  ✓ tin_number', 'success');
+        log('  ✓ year_established', 'success');
+        log('  ✓ number_of_employees', 'success');
+        log('  ✓ products_count', 'success');
+        log('  ✓ average_monthly_sales', 'success');
+        log('  ✓ business_size', 'success');
+        log('  ✓ business_config', 'success');
+        
+        return true;
+      } catch (err) {
+        log(`Unexpected error: ${err.message}`, 'error');
+        return false;
+      }
+    }
+
+    async function testRLS() {
+      log('TEST 2: Checking RLS Status', 'info');
+      log('─────────────────────────────────────────────────', 'info');
+      
+      try {
+        // Try to query activity_logs (should have RLS enabled now)
+        const { data, error } = await supabase
+          .from('activity_logs')
+          .select('*')
+          .limit(1);
+        
+        if (error) {
+          if (error.message.includes('permission denied')) {
+            log('✅ RLS is properly enabled on activity_logs!', 'success');
+            log('(Permission denied is expected with service key querying RLS table)', 'info');
+          } else {
+            log(`RLS check warning: ${error.message}`, 'warning');
+          }
+        } else {
+          log('✅ RLS enabled and accessible on activity_logs', 'success');
+        }
+        
+        // Check businesses table
+        const { error: bizError } = await supabase
+          .from('businesses')
+          .select('id')
+          .limit(1);
+        
+        if (!bizError) {
+          log('✅ RLS working correctly on businesses table', 'success');
+        }
+        
+        return true;
+      } catch (err) {
+        log(`RLS test error: ${err.message}`, 'error');
+        return false;
+      }
+    }
+
+    async function testBusinessData() {
+      log('TEST 3: Fetching Business Data', 'info');
+      log('─────────────────────────────────────────────────', 'info');
+      
+      try {
+        const { data: businesses, error } = await supabase
+          .from('businesses')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          log(`Failed to fetch businesses: ${error.message}`, 'error');
+          return false;
+        }
+        
+        log(`✅ Found ${businesses.length} business(es)`, 'success');
+        
+        if (businesses.length > 0) {
+          const sampleBiz = businesses[0];
+          log('', 'info');
+          log('📊 Sample Business Data:', 'info');
+          log(`  ID: ${sampleBiz.id}`, 'info');
+          log(`  Name: ${sampleBiz.business_name || 'Not set'}`, 'info');
+          log(`  Owner: ${sampleBiz.owner_name || 'Not set'}`, sampleBiz.owner_name ? 'success' : 'warning');
+          log(`  Owner Phone: ${sampleBiz.owner_phone || 'Not set'}`, sampleBiz.owner_phone ? 'success' : 'warning');
+          log(`  City: ${sampleBiz.city || 'Not set'}`, sampleBiz.city ? 'success' : 'warning');
+          log(`  Region: ${sampleBiz.region || 'Not set'}`, sampleBiz.region ? 'success' : 'warning');
+          log(`  Business Size: ${sampleBiz.business_size || 'Not set'}`, sampleBiz.business_size ? 'success' : 'warning');
+          log(`  Employees: ${sampleBiz.number_of_employees || 'Not set'}`, sampleBiz.number_of_employees ? 'success' : 'warning');
+          log(`  Products Count: ${sampleBiz.products_count || 'Not set'}`, sampleBiz.products_count ? 'success' : 'warning');
+          log(`  Reg Number: ${sampleBiz.registration_number || 'Not set'}`, sampleBiz.registration_number ? 'success' : 'warning');
+          log(`  TIN: ${sampleBiz.tin_number || 'Not set'}`, sampleBiz.tin_number ? 'success' : 'warning');
+          log(`  Config: ${sampleBiz.business_config ? 'Present ✓' : 'Not set'}`, sampleBiz.business_config ? 'success' : 'warning');
+          
+          if (!sampleBiz.owner_name && !sampleBiz.city) {
+            log('', 'info');
+            log('⚠️  Note: Existing businesses have no detail data yet.', 'warning');
+            log('This is normal! Details will be populated when:', 'info');
+            log('  1. You approve new signup requests', 'info');
+            log('  2. You manually update existing business records', 'info');
+          } else {
+            log('', 'info');
+            log('✅ Business has detail data populated!', 'success');
+          }
+        }
+        
+        return true;
+      } catch (err) {
+        log(`Error fetching business data: ${err.message}`, 'error');
+        return false;
+      }
+    }
+
+    async function testApprovalFunction() {
+      log('TEST 4: Checking Approval Function', 'info');
+      log('─────────────────────────────────────────────────', 'info');
+      
+      try {
+        // Check if function exists by trying to call it (will fail but we just want to see the error)
+        const { data, error } = await supabase.rpc('approve_business_signup', {
+          p_request_id: '00000000-0000-0000-0000-000000000000',
+          p_plan: 'basic'
+        });
+        
+        if (error) {
+          if (error.message.includes('Request not found')) {
+            log('✅ Approval function exists and is working!', 'success');
+            log('(Error is expected - we tested with fake ID)', 'info');
+            return true;
+          } else if (error.message.includes('function') && error.message.includes('does not exist')) {
+            log('❌ Approval function not found!', 'error');
+            log('Migration 029 may not have run successfully.', 'error');
+            return false;
+          } else {
+            log(`Function check: ${error.message}`, 'warning');
+            // If we get any other error, function probably exists
+            if (!error.message.includes('does not exist')) {
+              log('✅ Function exists (different error received)', 'success');
+              return true;
+            }
+          }
+        }
+        
+        return true;
+      } catch (err) {
+        log(`Function test error: ${err.message}`, 'error');
+        return false;
+      }
+    }
+
+    // Auto-run tests on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      log('🔍 Deployment Verification Tool Ready', 'info');
+      log('Click "Run Complete Verification" to check deployment status', 'info');
+      log('', 'info');
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix Super Admin Role</title>
+</head>
+<body>
+    <h1>🔧 Fix Super Admin Role</h1>
+    <div id="status">Please wait...</div>
+    
+    <script>
+        async function fixSuperAdminRole() {
+            try {
+                console.log('🔧 Fixing Super Admin role...')
+                
+                // First, create the account if it doesn't exist
+                const createResponse = await fetch(
+                    'https://cddoboboxeangripcqrn.supabase.co/functions/v1/make-server-86b98184/auth/create-admin',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTgyNTQsImV4cCI6MjA3NTMzNDI1NH0.JS5pdOsT8xocAIA9uPYnWsoE0FwChKJ1jfOIObJRpEo'
+                        },
+                        body: JSON.stringify({
+                            email: 'admin@rekon360.com',
+                            password: 'SuperAdmin123!',
+                            name: 'Rekon360 Owner',
+                            role: 'super_admin'
+                        })
+                    }
+                )
+                
+                const createData = await createResponse.json()
+                console.log('✅ Account creation response:', createData)
+                
+                if (createData.success) {
+                    document.getElementById('status').innerHTML = `
+                        <div style="color: green; font-size: 18px;">
+                            ✅ <strong>SUPER ADMIN ACCOUNT READY!</strong><br><br>
+                            📧 <strong>Email:</strong> admin@rekon360.com<br>
+                            🔑 <strong>Password:</strong> SuperAdmin123!<br>
+                            👤 <strong>Role:</strong> ${createData.user.role}<br><br>
+                            🚀 <strong>Now try logging in to your app!</strong><br>
+                            <strong>If it still doesn't work, check the browser console for debug messages.</strong>
+                        </div>
+                    `
+                } else {
+                    document.getElementById('status').innerHTML = `
+                        <div style="color: orange; font-size: 18px;">
+                            ⚠️ <strong>ACCOUNT ALREADY EXISTS:</strong> ${createData.error}<br><br>
+                            📧 <strong>Email:</strong> admin@rekon360.com<br>
+                            🔑 <strong>Password:</strong> SuperAdmin123!<br><br>
+                            🚀 <strong>Try logging in to your app now!</strong>
+                        </div>
+                    `
+                }
+                
+            } catch (error) {
+                console.error('❌ Fix failed:', error)
+                document.getElementById('status').innerHTML = `
+                    <div style="color: red; font-size: 18px;">
+                        ❌ <strong>FIX FAILED:</strong> ${error.message}
+                    </div>
+                `
+            }
+        }
+        
+        // Run the fix when page loads
+        fixSuperAdminRole()
+    </script>
+</body>
+</html>

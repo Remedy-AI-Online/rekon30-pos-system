@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Credit Sales System - Rekon360</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 1.1em;
+    }
+    .step {
+      background: #f8f9fa;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+    }
+    .step-number {
+      background: #667eea;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .sql-box {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 15px 0;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .btn {
+      background: #667eea;
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .btn-success {
+      background: #28a745;
+    }
+    .btn-success:hover {
+      background: #218838;
+    }
+    .success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .info {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .warning {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .link {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .link:hover {
+      text-decoration: underline;
+    }
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+    .feature-list li {
+      padding: 8px 0;
+      padding-left: 30px;
+      position: relative;
+    }
+    .feature-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #28a745;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 Setup Credit Sales System</h1>
+    <p class="subtitle">Critical feature for Ghana market - Track "book" sales (credit)</p>
+
+    <div class="info">
+      <strong>📱 Why Credit Sales?</strong><br>
+      In Ghana, many shops allow trusted customers to buy on credit and pay later. This is called "book" sales -
+      where shopkeepers write in a book "Auntie Ama owes 150 GHS". This feature digitizes that process!
+    </div>
+
+    <div class="step">
+      <span class="step-number">1</span>
+      <strong>What You Get:</strong>
+      <ul class="feature-list">
+        <li>Track customers who buy on credit ("book" customers)</li>
+        <li>Set credit limits per customer (e.g., max 500 GHS)</li>
+        <li>Record credit sales from POS</li>
+        <li>Track who owes what: "Auntie Ama owes 150 GHS"</li>
+        <li>Record payments (Cash, MoMo, etc.)</li>
+        <li>SMS reminders for overdue payments (coming soon)</li>
+        <li>View payment history</li>
+        <li>Dashboard with total owed, overdue amounts</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <strong>Copy SQL to Clipboard:</strong>
+      <p>Click the button below to copy the SQL code, then paste it in Supabase SQL Editor.</p>
+      <button class="btn" onclick="copySQLToClipboard()">📋 Copy SQL</button>
+      <div id="copySuccess" style="display: none;" class="success">
+        ✅ SQL copied to clipboard! Now paste it in Supabase.
+      </div>
+      <div class="sql-box" id="sqlCode">-- Credit Sales System for Rekon360
+-- Allows shops to track "book" sales (credit) - critical for Ghana market
+
+-- 1. Customers table - Track customers who buy on credit
+CREATE TABLE IF NOT EXISTS customers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  email TEXT,
+  address TEXT,
+  credit_limit DECIMAL(10, 2) DEFAULT 0,
+  current_balance DECIMAL(10, 2) DEFAULT 0,
+  total_purchased DECIMAL(10, 2) DEFAULT 0,
+  total_paid DECIMAL(10, 2) DEFAULT 0,
+  status TEXT DEFAULT 'Active',
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 2. Credit Sales table - Track individual credit transactions
+CREATE TABLE IF NOT EXISTS credit_sales (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id TEXT NOT NULL,
+  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  sale_id TEXT,
+  receipt_id TEXT NOT NULL,
+  cashier_id TEXT,
+  cashier_name TEXT,
+  items JSONB NOT NULL,
+  total_amount DECIMAL(10, 2) NOT NULL,
+  amount_paid DECIMAL(10, 2) DEFAULT 0,
+  amount_owed DECIMAL(10, 2) NOT NULL,
+  payment_status TEXT DEFAULT 'Unpaid',
+  due_date DATE,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 3. Credit Payments table - Track payments made on credit
+CREATE TABLE IF NOT EXISTS credit_payments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id TEXT NOT NULL,
+  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  credit_sale_id UUID REFERENCES credit_sales(id) ON DELETE SET NULL,
+  amount DECIMAL(10, 2) NOT NULL,
+  payment_method TEXT NOT NULL,
+  reference_number TEXT,
+  received_by TEXT,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_customers_business_id ON customers(business_id);
+CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(business_id, phone);
+CREATE INDEX IF NOT EXISTS idx_credit_sales_business_id ON credit_sales(business_id);
+CREATE INDEX IF NOT EXISTS idx_credit_sales_customer_id ON credit_sales(customer_id);
+CREATE INDEX IF NOT EXISTS idx_credit_sales_payment_status ON credit_sales(business_id, payment_status);
+CREATE INDEX IF NOT EXISTS idx_credit_payments_business_id ON credit_payments(business_id);
+CREATE INDEX IF NOT EXISTS idx_credit_payments_customer_id ON credit_payments(customer_id);
+
+-- Enable Row Level Security
+ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE credit_sales ENABLE ROW LEVEL SECURITY;
+ALTER TABLE credit_payments ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for customers
+CREATE POLICY "Users can view their own business customers"
+  ON customers FOR SELECT
+  USING (business_id = current_setting('app.current_business_id', true));
+
+CREATE POLICY "Users can insert their own business customers"
+  ON customers FOR INSERT
+  WITH CHECK (business_id = current_setting('app.current_business_id', true));
+
+CREATE POLICY "Users can update their own business customers"
+  ON customers FOR UPDATE
+  USING (business_id = current_setting('app.current_business_id', true));
+
+CREATE POLICY "Users can delete their own business customers"
+  ON customers FOR DELETE
+  USING (business_id = current_setting('app.current_business_id', true));
+
+-- RLS Policies for credit_sales
+CREATE POLICY "Users can view their own business credit sales"
+  ON credit_sales FOR SELECT
+  USING (business_id = current_setting('app.current_business_id', true));
+
+CREATE POLICY "Users can insert their own business credit sales"
+  ON credit_sales FOR INSERT
+  WITH CHECK (business_id = current_setting('app.current_business_id', true));
+
+CREATE POLICY "Users can update their own business credit sales"
+  ON credit_sales FOR UPDATE
+  USING (business_id = current_setting('app.current_business_id', true));
+
+-- RLS Policies for credit_payments
+CREATE POLICY "Users can view their own business credit payments"
+  ON credit_payments FOR SELECT
+  USING (business_id = current_setting('app.current_business_id', true));
+
+CREATE POLICY "Users can insert their own business credit payments"
+  ON credit_payments FOR INSERT
+  WITH CHECK (business_id = current_setting('app.current_business_id', true));
+
+-- Function to automatically update customer balance
+CREATE OR REPLACE FUNCTION update_customer_balance()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE customers
+  SET
+    current_balance = (
+      SELECT COALESCE(SUM(amount_owed), 0)
+      FROM credit_sales
+      WHERE customer_id = NEW.customer_id
+      AND payment_status != 'Paid'
+    ),
+    total_purchased = (
+      SELECT COALESCE(SUM(total_amount), 0)
+      FROM credit_sales
+      WHERE customer_id = NEW.customer_id
+    ),
+    total_paid = (
+      SELECT COALESCE(SUM(amount), 0)
+      FROM credit_payments
+      WHERE customer_id = NEW.customer_id
+    ),
+    updated_at = NOW()
+  WHERE id = NEW.customer_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Triggers to update customer balance automatically
+CREATE TRIGGER update_balance_after_credit_sale
+  AFTER INSERT OR UPDATE ON credit_sales
+  FOR EACH ROW
+  EXECUTE FUNCTION update_customer_balance();
+
+CREATE TRIGGER update_balance_after_payment
+  AFTER INSERT ON credit_payments
+  FOR EACH ROW
+  EXECUTE FUNCTION update_customer_balance();
+
+-- Function to update credit sale payment status
+CREATE OR REPLACE FUNCTION update_credit_sale_status()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE credit_sales
+  SET
+    amount_paid = (
+      SELECT COALESCE(SUM(amount), 0)
+      FROM credit_payments
+      WHERE credit_sale_id = NEW.credit_sale_id
+    ),
+    payment_status = CASE
+      WHEN (
+        SELECT COALESCE(SUM(amount), 0)
+        FROM credit_payments
+        WHERE credit_sale_id = NEW.credit_sale_id
+      ) >= total_amount THEN 'Paid'
+      WHEN (
+        SELECT COALESCE(SUM(amount), 0)
+        FROM credit_payments
+        WHERE credit_sale_id = NEW.credit_sale_id
+      ) > 0 THEN 'Partial'
+      ELSE 'Unpaid'
+    END,
+    amount_owed = total_amount - (
+      SELECT COALESCE(SUM(amount), 0)
+      FROM credit_payments
+      WHERE credit_sale_id = NEW.credit_sale_id
+    ),
+    updated_at = NOW()
+  WHERE id = NEW.credit_sale_id;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to update credit sale status after payment
+CREATE TRIGGER update_sale_status_after_payment
+  AFTER INSERT ON credit_payments
+  FOR EACH ROW
+  EXECUTE FUNCTION update_credit_sale_status();
+
+-- Verify tables created
+SELECT
+  'customers' as table_name,
+  COUNT(*) as row_count
+FROM customers
+UNION ALL
+SELECT
+  'credit_sales' as table_name,
+  COUNT(*) as row_count
+FROM credit_sales
+UNION ALL
+SELECT
+  'credit_payments' as table_name,
+  COUNT(*) as row_count
+FROM credit_payments;</div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">3</span>
+      <strong>Run SQL in Supabase:</strong>
+      <ol>
+        <li>Go to: <a href="https://supabase.com/dashboard/project/cddoboboxeangripcqrn/editor" target="_blank" class="link">Supabase SQL Editor</a></li>
+        <li>Click <strong>"New Query"</strong></li>
+        <li>Paste the SQL you copied above</li>
+        <li>Click <strong>"Run"</strong> (or press Ctrl+Enter)</li>
+        <li>You should see success messages and a verification table at the end</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <span class="step-number">4</span>
+      <strong>Verify Setup:</strong>
+      <p>After running the SQL, you should see:</p>
+      <div class="sql-box">
+table_name       | row_count
+-----------------|-----------
+customers        | 0
+credit_sales     | 0
+credit_payments  | 0</div>
+      <p>This means the tables were created successfully!</p>
+    </div>
+
+    <div class="warning">
+      <strong>⚠️ Important Notes:</strong>
+      <ul>
+        <li>Backend already deployed with credit sales endpoints</li>
+        <li>You MUST run the SQL above for the feature to work</li>
+        <li>Automatic triggers will keep balances updated</li>
+        <li>Stock will automatically reduce on credit sales (just like regular sales)</li>
+      </ul>
+    </div>
+
+    <div class="success">
+      <strong>✅ After Setup, You Can:</strong>
+      <ul>
+        <li><strong>Admin:</strong> Access "Credit Management" page to add credit customers</li>
+        <li><strong>Cashier:</strong> Select "Credit Sale (Book)" option in POS</li>
+        <li><strong>Admin:</strong> View who owes what and record payments</li>
+        <li><strong>Admin:</strong> Get SMS reminders for overdue payments (coming soon)</li>
+      </ul>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+      <a href="https://supabase.com/dashboard/project/cddoboboxeangripcqrn/editor" target="_blank">
+        <button class="btn btn-success">🚀 Open Supabase SQL Editor</button>
+      </a>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; color: #666; font-size: 14px;">
+      <p>Need help? Check WHATS_NEXT_FOR_REKON360.md for more features!</p>
+    </div>
+  </div>
+
+  <script>
+    function copySQLToClipboard() {
+      const sqlCode = document.getElementById('sqlCode').innerText;
+      navigator.clipboard.writeText(sqlCode).then(() => {
+        document.getElementById('copySuccess').style.display = 'block';
+        setTimeout(() => {
+          document.getElementById('copySuccess').style.display = 'none';
+        }, 3000);
+      });
+    }
+  </script>
+</body>
+</html>

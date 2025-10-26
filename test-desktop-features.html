@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rekon360 Desktop Features Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    
+    .content {
+      padding: 30px;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+    }
+    
+    .section h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+    
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .test-button {
+      padding: 12px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .test-button:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+    }
+    
+    .test-button:active {
+      transform: translateY(0);
+    }
+    
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+    
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+    
+    .info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border-left: 4px solid #17a2b8;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    
+    .status-online {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-offline {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-desktop {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🖥️ Rekon360 Desktop Features Test</h1>
+      <p>Test all offline and desktop-specific features</p>
+      <div style="margin-top: 15px;">
+        <span id="platformStatus" class="status-badge">Checking...</span>
+        <span id="connectionStatus" class="status-badge">Checking...</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Platform Detection -->
+      <div class="section">
+        <h2>🔍 Platform Detection</h2>
+        <div class="test-grid">
+          <button class="test-button" onclick="testPlatform()">Check Platform</button>
+          <button class="test-button" onclick="testElectronAPI()">Test Electron API</button>
+        </div>
+        <div id="platformResult" class="result" style="display:none;"></div>
+      </div>
+
+      <!-- Offline Data Storage -->
+      <div class="section">
+        <h2>💾 Offline Data Storage</h2>
+        <div class="test-grid">
+          <button class="test-button" onclick="testSaveOffline()">Save Sample Data</button>
+          <button class="test-button" onclick="testGetOfflineData()">Get Offline Data</button>
+          <button class="test-button" onclick="testGetStats()">Get Statistics</button>
+        </div>
+        <div id="offlineResult" class="result" style="display:none;"></div>
+      </div>
+
+      <!-- Sync Features -->
+      <div class="section">
+        <h2>🔄 Sync Features</h2>
+        <div class="test-grid">
+          <button class="test-button" onclick="testForceSync()">Force Sync</button>
+          <button class="test-button" onclick="testCheckConnection()">Check Connection</button>
+          <button class="test-button" onclick="testConnectionStatus()">Get Full Status</button>
+        </div>
+        <div id="syncResult" class="result" style="display:none;"></div>
+      </div>
+
+      <!-- Data Management -->
+      <div class="section">
+        <h2>🗂️ Data Management</h2>
+        <div class="test-grid">
+          <button class="test-button" onclick="testExportData()">Export Data</button>
+          <button class="test-button" onclick="testClearData()">Clear Offline Data</button>
+        </div>
+        <div id="dataResult" class="result" style="display:none;"></div>
+      </div>
+
+      <!-- Stress Test -->
+      <div class="section">
+        <h2>⚡ Stress Test</h2>
+        <div class="test-grid">
+          <button class="test-button" onclick="testBatchSave()">Save 100 Records</button>
+          <button class="test-button" onclick="testAllFeatures()">Test All Features</button>
+        </div>
+        <div id="stressResult" class="result" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if running in Electron
+    const isElectron = !!(window.electronAPI)
+    
+    // Update status badges
+    function updateStatus() {
+      const platformStatus = document.getElementById('platformStatus')
+      const connectionStatus = document.getElementById('connectionStatus')
+      
+      if (isElectron) {
+        platformStatus.textContent = '🖥️ Desktop App'
+        platformStatus.className = 'status-badge status-desktop'
+      } else {
+        platformStatus.textContent = '🌐 Web Browser'
+        platformStatus.className = 'status-badge'
+      }
+      
+      if (navigator.onLine) {
+        connectionStatus.textContent = '✅ Online'
+        connectionStatus.className = 'status-badge status-online'
+      } else {
+        connectionStatus.textContent = '📴 Offline'
+        connectionStatus.className = 'status-badge status-offline'
+      }
+    }
+    
+    updateStatus()
+    window.addEventListener('online', updateStatus)
+    window.addEventListener('offline', updateStatus)
+    
+    // Helper function to show results
+    function showResult(elementId, message, type = 'info') {
+      const el = document.getElementById(elementId)
+      el.style.display = 'block'
+      el.className = `result ${type}`
+      el.innerHTML = message
+    }
+    
+    // Test Platform Detection
+    function testPlatform() {
+      const info = {
+        isElectron,
+        platform: navigator.platform,
+        userAgent: navigator.userAgent,
+        online: navigator.onLine,
+        language: navigator.language
+      }
+      showResult('platformResult', `<pre>${JSON.stringify(info, null, 2)}</pre>`, 'info')
+    }
+    
+    // Test Electron API
+    async function testElectronAPI() {
+      if (!isElectron) {
+        showResult('platformResult', '❌ Not running in Electron - open this in the desktop app!', 'error')
+        return
+      }
+      
+      const apis = {
+        saveOfflineData: typeof window.electronAPI.saveOfflineData,
+        getOfflineData: typeof window.electronAPI.getOfflineData,
+        clearOfflineData: typeof window.electronAPI.clearOfflineData,
+        getOfflineStats: typeof window.electronAPI.getOfflineStats,
+        exportOfflineData: typeof window.electronAPI.exportOfflineData,
+        checkConnection: typeof window.electronAPI.checkConnection,
+        isDesktop: typeof window.electronAPI.isDesktop
+      }
+      
+      showResult('platformResult', `<pre>${JSON.stringify(apis, null, 2)}</pre>`, 'success')
+    }
+    
+    // Test Save Offline
+    async function testSaveOffline() {
+      if (!isElectron) {
+        showResult('offlineResult', '❌ Desktop features only available in desktop app', 'error')
+        return
+      }
+      
+      try {
+        const sampleData = {
+          sales: [
+            { id: '1', amount: 100, date: new Date().toISOString() },
+            { id: '2', amount: 200, date: new Date().toISOString() }
+          ],
+          customers: [
+            { id: 'c1', name: 'John Doe', phone: '0241234567' }
+          ],
+          products: [
+            { id: 'p1', name: 'Test Product', price: 50 }
+          ]
+        }
+        
+        const result = await window.electronAPI.saveOfflineData(sampleData)
+        showResult('offlineResult', `<pre>${JSON.stringify(result, null, 2)}</pre>`, 
+          result.success ? 'success' : 'error')
+      } catch (error) {
+        showResult('offlineResult', `❌ Error: ${error.message}`, 'error')
+      }
+    }
+    
+    // Test Get Offline Data
+    async function testGetOfflineData() {
+      if (!isElectron) {
+        showResult('offlineResult', '❌ Desktop features only available in desktop app', 'error')
+        return
+      }
+      
+      try {
+        const result = await window.electronAPI.getOfflineData()
+        if (result.success) {
+          const summary = {
+            sales: result.data.sales.length,
+            customers: result.data.customers.length,
+            products: result.data.products.length,
+            workers: result.data.workers?.length || 0,
+            lastSync: result.data.lastSync
+          }
+          showResult('offlineResult', `<pre>${JSON.stringify(summary, null, 2)}</pre>`, 'success')
+        } else {
+          showResult('offlineResult', `❌ ${result.message}`, 'error')
+        }
+      } catch (error) {
+        showResult('offlineResult', `❌ Error: ${error.message}`, 'error')
+      }
+    }
+    
+    // Test Get Stats
+    async function testGetStats() {
+      if (!isElectron) {
+        showResult('offlineResult', '❌ Desktop features only available in desktop app', 'error')
+        return
+      }
+      
+      try {
+        const result = await window.electronAPI.getOfflineStats()
+        showResult('offlineResult', `<pre>${JSON.stringify(result.stats, null, 2)}</pre>`, 
+          result.success ? 'success' : 'error')
+      } catch (error) {
+        showResult('offlineResult', `❌ Error: ${error.message}`, 'error')
+      }
+    }
+    
+    // Test Force Sync
+    async function testForceSync() {
+      showResult('syncResult', '🔄 This would trigger a sync with Supabase...', 'info')
+    }
+    
+    // Test Check Connection
+    async function testCheckConnection() {
+      if (!isElectron) {
+        showResult('syncResult', `Online: ${navigator.onLine}`, 'info')
+        return
+      }
+      
+      try {
+        const result = await window.electronAPI.checkConnection()
+        showResult('syncResult', `<pre>${JSON.stringify(result, null, 2)}</pre>`, 
+          result.online ? 'success' : 'error')
+      } catch (error) {
+        showResult('syncResult', `❌ Error: ${error.message}`, 'error')
+      }
+    }
+    
+    // Test Connection Status
+    function testConnectionStatus() {
+      const status = {
+        online: navigator.onLine,
+        effectiveType: navigator.connection?.effectiveType || 'unknown',
+        downlink: navigator.connection?.downlink || 'unknown',
+        rtt: navigator.connection?.rtt || 'unknown'
+      }
+      showResult('syncResult', `<pre>${JSON.stringify(status, null, 2)}</pre>`, 'info')
+    }
+    
+    // Test Export Data
+    async function testExportData() {
+      if (!isElectron) {
+        showResult('dataResult', '❌ Export only available in desktop app', 'error')
+        return
+      }
+      
+      try {
+        const result = await window.electronAPI.exportOfflineData()
+        showResult('dataResult', `<pre>${JSON.stringify(result, null, 2)}</pre>`, 
+          result.success ? 'success' : 'error')
+      } catch (error) {
+        showResult('dataResult', `❌ Error: ${error.message}`, 'error')
+      }
+    }
+    
+    // Test Clear Data
+    async function testClearData() {
+      if (!isElectron) {
+        showResult('dataResult', '❌ Clear only available in desktop app', 'error')
+        return
+      }
+      
+      if (!confirm('Clear all offline data?')) return
+      
+      try {
+        const result = await window.electronAPI.clearOfflineData()
+        showResult('dataResult', `<pre>${JSON.stringify(result, null, 2)}</pre>`, 
+          result.success ? 'success' : 'error')
+      } catch (error) {
+        showResult('dataResult', `❌ Error: ${error.message}`, 'error')
+      }
+    }
+    
+    // Test Batch Save
+    async function testBatchSave() {
+      if (!isElectron) {
+        showResult('stressResult', '❌ Desktop features only available in desktop app', 'error')
+        return
+      }
+      
+      try {
+        const batchData = {
+          sales: Array.from({ length: 100 }, (_, i) => ({
+            id: `sale-${i}`,
+            amount: Math.random() * 1000,
+            date: new Date().toISOString()
+          }))
+        }
+        
+        const start = performance.now()
+        const result = await window.electronAPI.saveOfflineData(batchData)
+        const duration = (performance.now() - start).toFixed(2)
+        
+        showResult('stressResult', 
+          `✅ Saved 100 records in ${duration}ms\n\n<pre>${JSON.stringify(result, null, 2)}</pre>`,
+          'success')
+      } catch (error) {
+        showResult('stressResult', `❌ Error: ${error.message}`, 'error')
+      }
+    }
+    
+    // Test All Features
+    async function testAllFeatures() {
+      showResult('stressResult', '🔄 Testing all features...', 'info')
+      
+      await new Promise(r => setTimeout(r, 500))
+      await testSaveOffline()
+      
+      await new Promise(r => setTimeout(r, 500))
+      await testGetOfflineData()
+      
+      await new Promise(r => setTimeout(r, 500))
+      await testGetStats()
+      
+      await new Promise(r => setTimeout(r, 500))
+      await testCheckConnection()
+      
+      showResult('stressResult', '✅ All tests completed! Check results above.', 'success')
+    }
+  </script>
+</body>
+</html>
+

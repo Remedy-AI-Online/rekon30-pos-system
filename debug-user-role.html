@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug User Role</title>
+</head>
+<body>
+    <h1>🔍 Debug User Role</h1>
+    <div id="status">Please wait...</div>
+    
+    <script>
+        async function debugUserRole() {
+            try {
+                console.log('🔍 Debugging user role...')
+                
+                // Test login
+                const loginResponse = await fetch(
+                    'https://cddoboboxeangripcqrn.supabase.co/functions/v1/make-server-86b98184/auth/login',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTgyNTQsImV4cCI6MjA3NTMzNDI1NH0.JS5pdOsT8xocAIA9uPYnWsoE0FwChKJ1jfOIObJRpEo'
+                        },
+                        body: JSON.stringify({
+                            email: 'admin@rekon360.com',
+                            password: 'SuperAdmin123!'
+                        })
+                    }
+                )
+                
+                const loginData = await loginResponse.json()
+                console.log('🔍 Login response:', loginData)
+                
+                if (loginData.success) {
+                    document.getElementById('status').innerHTML = `
+                        <div style="color: green; font-size: 18px;">
+                            ✅ <strong>LOGIN SUCCESS!</strong><br><br>
+                            📧 <strong>Email:</strong> ${loginData.user.email}<br>
+                            👤 <strong>Role:</strong> ${loginData.user.role}<br>
+                            🆔 <strong>ID:</strong> ${loginData.user.id}<br>
+                            📝 <strong>Name:</strong> ${loginData.user.name}<br><br>
+                            <strong>Full User Object:</strong><br>
+                            <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px;">${JSON.stringify(loginData.user, null, 2)}</pre>
+                        </div>
+                    `
+                } else {
+                    document.getElementById('status').innerHTML = `
+                        <div style="color: red; font-size: 18px;">
+                            ❌ <strong>LOGIN FAILED:</strong> ${loginData.error}
+                        </div>
+                    `
+                }
+                
+            } catch (error) {
+                console.error('❌ Debug failed:', error)
+                document.getElementById('status').innerHTML = `
+                    <div style="color: red; font-size: 18px;">
+                        ❌ <strong>DEBUG FAILED:</strong> ${error.message}
+                    </div>
+                `
+            }
+        }
+        
+        // Run the debug when page loads
+        debugUserRole()
+    </script>
+</body>
+</html>

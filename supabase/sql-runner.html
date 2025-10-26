@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase SQL Runner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .sql-editor {
+            width: 100%;
+            height: 300px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            resize: vertical;
+        }
+        .button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background-color: #2563eb;
+        }
+        .button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+        }
+        .success {
+            background-color: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+        .error {
+            background-color: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+        .info {
+            background-color: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1e40af;
+        }
+        .sql-snippets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .sql-snippet {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 15px;
+        }
+        .sql-snippet h4 {
+            margin: 0 0 10px 0;
+            color: #374151;
+        }
+        .sql-snippet pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 0;
+        }
+        .copy-btn {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .copy-btn:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Supabase SQL Runner</h1>
+            <p>Run SQL commands directly on your Supabase database</p>
+        </div>
+
+        <div class="sql-snippets">
+            <div class="sql-snippet">
+                <h4>1. Create Products Table</h4>
+                <pre id="sql1">CREATE TABLE IF NOT EXISTS products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  sku TEXT UNIQUE NOT NULL,
+  category TEXT NOT NULL,
+  supplier TEXT,
+  description TEXT,
+  price DECIMAL(10, 2) NOT NULL,
+  cost DECIMAL(10, 2),
+  stock INTEGER NOT NULL DEFAULT 0,
+  low_stock_threshold INTEGER DEFAULT 10,
+  status TEXT DEFAULT 'Active' CHECK (status IN ('Active', 'Low Stock', 'Out of Stock')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);</pre>
+                <button class="copy-btn" onclick="copyToEditor('sql1')">Copy to Editor</button>
+            </div>
+
+            <div class="sql-snippet">
+                <h4>2. Create Customers Table</h4>
+                <pre id="sql2">CREATE TABLE IF NOT EXISTS customers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  phone TEXT,
+  email TEXT,
+  address TEXT,
+  total_purchases DECIMAL(10, 2) DEFAULT 0,
+  loyalty_points INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);</pre>
+                <button class="copy-btn" onclick="copyToEditor('sql2')">Copy to Editor</button>
+            </div>
+
+            <div class="sql-snippet">
+                <h4>3. Create Workers Table</h4>
+                <pre id="sql3">CREATE TABLE IF NOT EXISTS workers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT NOT NULL,
+  position TEXT NOT NULL,
+  department TEXT,
+  shop_id TEXT NOT NULL,
+  shop_name TEXT NOT NULL,
+  salary DECIMAL(10, 2) NOT NULL,
+  hire_date DATE NOT NULL,
+  status TEXT DEFAULT 'Active' CHECK (status IN ('Active', 'Inactive', 'On Leave')),
+  address TEXT,
+  emergency_contact TEXT,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);</pre>
+                <button class="copy-btn" onclick="copyToEditor('sql3')">Copy to Editor</button>
+            </div>
+
+            <div class="sql-snippet">
+                <h4>4. Create Cashiers Table</h4>
+                <pre id="sql4">CREATE TABLE IF NOT EXISTS cashiers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  worker_id UUID REFERENCES workers(id) ON DELETE CASCADE,
+  worker_name TEXT NOT NULL,
+  shop_id TEXT NOT NULL,
+  shop_name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  auth_user_id UUID,
+  active BOOLEAN DEFAULT true,
+  last_login TIMESTAMPTZ,
+  login_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);</pre>
+                <button class="copy-btn" onclick="copyToEditor('sql4')">Copy to Editor</button>
+            </div>
+
+            <div class="sql-snippet">
+                <h4>5. Create Sales Table</h4>
+                <pre id="sql5">CREATE TABLE IF NOT EXISTS sales (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  receipt_id TEXT UNIQUE NOT NULL,
+  date DATE NOT NULL,
+  timestamp TIMESTAMPTZ DEFAULT NOW(),
+  cashier_id UUID REFERENCES cashiers(id),
+  cashier_name TEXT,
+  shop_id TEXT NOT NULL,
+  shop_name TEXT,
+  customer_id UUID REFERENCES customers(id),
+  customer_name TEXT,
+  customer_phone TEXT,
+  customer_email TEXT,
+  payment_method TEXT NOT NULL,
+  subtotal DECIMAL(10, 2) NOT NULL,
+  tax DECIMAL(10, 2) DEFAULT 0,
+  discount DECIMAL(10, 2) DEFAULT 0,
+  total DECIMAL(10, 2) NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);</pre>
+                <button class="copy-btn" onclick="copyToEditor('sql5')">Copy to Editor</button>
+            </div>
+
+            <div class="sql-snippet">
+                <h4>6. Create Sale Items Table</h4>
+                <pre id="sql6">CREATE TABLE IF NOT EXISTS sale_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sale_id UUID REFERENCES sales(id) ON DELETE CASCADE,
+  product_id UUID REFERENCES products(id),
+  product_name TEXT NOT NULL,
+  product_sku TEXT,
+  size TEXT,
+  quantity INTEGER NOT NULL,
+  unit_price DECIMAL(10, 2) NOT NULL,
+  unit_cost DECIMAL(10, 2),
+  total_price DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);</pre>
+                <button class="copy-btn" onclick="copyToEditor('sql6')">Copy to Editor</button>
+            </div>
+        </div>
+
+        <div>
+            <h3>SQL Editor</h3>
+            <textarea id="sqlEditor" class="sql-editor" placeholder="Enter your SQL commands here..."></textarea>
+            <br>
+            <button class="button" onclick="executeSQL()">🚀 Execute SQL</button>
+            <button class="button" onclick="clearEditor()">🗑️ Clear</button>
+            <button class="button" onclick="runAllTables()">📦 Create All Tables</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://cddoboboxeangripcqrn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTgyNTQsImV4cCI6MjA3NTMzNDI1NH0.JS5pdOsT8xocAIA9uPYnWsoE0FwChKJ1jfOIObJRpEo';
+
+        function copyToEditor(sqlId) {
+            const sql = document.getElementById(sqlId).textContent;
+            document.getElementById('sqlEditor').value = sql;
+        }
+
+        function clearEditor() {
+            document.getElementById('sqlEditor').value = '';
+            document.getElementById('result').innerHTML = '';
+        }
+
+        async function executeSQL() {
+            const sql = document.getElementById('sqlEditor').value.trim();
+            if (!sql) {
+                showResult('Please enter SQL commands', 'error');
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="result info">⏳ Executing SQL...</div>';
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/exec_sql`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ sql: sql })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`✅ SQL executed successfully!\n\nResult: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    showResult(`❌ SQL execution failed:\n\n${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function runAllTables() {
+            const allSQL = `
+-- Create all tables for Rekon30 Latex Foam Shop
+
+-- Products table
+CREATE TABLE IF NOT EXISTS products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  sku TEXT UNIQUE NOT NULL,
+  category TEXT NOT NULL,
+  supplier TEXT,
+  description TEXT,
+  price DECIMAL(10, 2) NOT NULL,
+  cost DECIMAL(10, 2),
+  stock INTEGER NOT NULL DEFAULT 0,
+  low_stock_threshold INTEGER DEFAULT 10,
+  status TEXT DEFAULT 'Active' CHECK (status IN ('Active', 'Low Stock', 'Out of Stock')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Customers table
+CREATE TABLE IF NOT EXISTS customers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  phone TEXT,
+  email TEXT,
+  address TEXT,
+  total_purchases DECIMAL(10, 2) DEFAULT 0,
+  loyalty_points INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Workers table
+CREATE TABLE IF NOT EXISTS workers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT NOT NULL,
+  position TEXT NOT NULL,
+  department TEXT,
+  shop_id TEXT NOT NULL,
+  shop_name TEXT NOT NULL,
+  salary DECIMAL(10, 2) NOT NULL,
+  hire_date DATE NOT NULL,
+  status TEXT DEFAULT 'Active' CHECK (status IN ('Active', 'Inactive', 'On Leave')),
+  address TEXT,
+  emergency_contact TEXT,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Cashiers table
+CREATE TABLE IF NOT EXISTS cashiers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  worker_id UUID REFERENCES workers(id) ON DELETE CASCADE,
+  worker_name TEXT NOT NULL,
+  shop_id TEXT NOT NULL,
+  shop_name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  auth_user_id UUID,
+  active BOOLEAN DEFAULT true,
+  last_login TIMESTAMPTZ,
+  login_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Sales table
+CREATE TABLE IF NOT EXISTS sales (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  receipt_id TEXT UNIQUE NOT NULL,
+  date DATE NOT NULL,
+  timestamp TIMESTAMPTZ DEFAULT NOW(),
+  cashier_id UUID REFERENCES cashiers(id),
+  cashier_name TEXT,
+  shop_id TEXT NOT NULL,
+  shop_name TEXT,
+  customer_id UUID REFERENCES customers(id),
+  customer_name TEXT,
+  customer_phone TEXT,
+  customer_email TEXT,
+  payment_method TEXT NOT NULL,
+  subtotal DECIMAL(10, 2) NOT NULL,
+  tax DECIMAL(10, 2) DEFAULT 0,
+  discount DECIMAL(10, 2) DEFAULT 0,
+  total DECIMAL(10, 2) NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Sale items table
+CREATE TABLE IF NOT EXISTS sale_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sale_id UUID REFERENCES sales(id) ON DELETE CASCADE,
+  product_id UUID REFERENCES products(id),
+  product_name TEXT NOT NULL,
+  product_sku TEXT,
+  size TEXT,
+  quantity INTEGER NOT NULL,
+  unit_price DECIMAL(10, 2) NOT NULL,
+  unit_cost DECIMAL(10, 2),
+  total_price DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_products_sku ON products(sku);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+CREATE INDEX IF NOT EXISTS idx_sales_date ON sales(date);
+CREATE INDEX IF NOT EXISTS idx_sales_cashier_id ON sales(cashier_id);
+CREATE INDEX IF NOT EXISTS idx_sale_items_sale_id ON sale_items(sale_id);
+            `;
+
+            document.getElementById('sqlEditor').value = allSQL;
+            await executeSQL();
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+    </script>
+</body>
+</html>

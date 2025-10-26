@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Supabase Client Instances</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; border-left: 4px solid #28a745; }
+        .error { background: #f8d7da; border-left: 4px solid #dc3545; }
+        .info { background: #d1ecf1; border-left: 4px solid #17a2b8; }
+        .test-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-btn:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Supabase Client Instances</h1>
+    <p>This will test if the multiple client warning is resolved.</p>
+    
+    <button class="test-btn" onclick="testClientInstances()">
+        🔍 Test Client Instances
+    </button>
+    
+    <button class="test-btn" onclick="testDataService()">
+        📊 Test Data Service
+    </button>
+    
+    <div id="result"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://cddoboboxeangripcqrn.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTgyNTQsImV4cCI6MjA3NTMzNDI1NH0.JS5pdOsT8xocAIA9uPYnWsoE0FwChKJ1jfOIObJRpEo'
+        
+        // Simulate the singleton pattern from authService
+        let supabaseClient = null
+        
+        function getSupabaseClient() {
+            if (!supabaseClient) {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+                console.log('✅ Created new Supabase client instance')
+            } else {
+                console.log('♻️ Reusing existing Supabase client instance')
+            }
+            return supabaseClient
+        }
+        
+        // Simulate the admin client singleton pattern
+        let supabaseAdmin = null
+        const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkZG9ib2JveGVhbmdyaXBjcXJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTc1ODI1NCwiZXhwIjoyMDc1MzM0MjU0fQ.CbCMnclEfF2iWZzLeI4VGIgKYEPuYAt7P-kSAfPr83Q'
+        
+        function getSupabaseAdmin() {
+            if (!supabaseAdmin) {
+                supabaseAdmin = supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
+                console.log('✅ Created new Supabase admin client instance')
+            } else {
+                console.log('♻️ Reusing existing Supabase admin client instance')
+            }
+            return supabaseAdmin
+        }
+
+        async function testClientInstances() {
+            const resultDiv = document.getElementById('result')
+            resultDiv.innerHTML = '<div class="info">🔄 Testing client instances...</div>'
+            
+            try {
+                console.log('🧪 Testing multiple client creation...')
+                
+                // Test multiple calls to getSupabaseClient
+                const client1 = getSupabaseClient()
+                const client2 = getSupabaseClient()
+                const client3 = getSupabaseClient()
+                
+                // Test multiple calls to getSupabaseAdmin
+                const admin1 = getSupabaseAdmin()
+                const admin2 = getSupabaseAdmin()
+                const admin3 = getSupabaseAdmin()
+                
+                // Check if they're the same instances
+                const clientsSame = client1 === client2 && client2 === client3
+                const adminsSame = admin1 === admin2 && admin2 === admin3
+                
+                if (clientsSame && adminsSame) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Singleton Pattern Working!</h3>
+                            <p>✅ Regular clients are the same instance: ${clientsSame}</p>
+                            <p>✅ Admin clients are the same instance: ${adminsSame}</p>
+                            <p>🎉 No multiple client warnings should appear!</p>
+                        </div>
+                    `
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Multiple Instances Created</h3>
+                            <p>Regular clients same: ${clientsSame}</p>
+                            <p>Admin clients same: ${adminsSame}</p>
+                        </div>
+                    `
+                }
+                
+            } catch (err) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>💥 Test Failed</h3>
+                        <p>${err.message}</p>
+                    </div>
+                `
+            }
+        }
+
+        async function testDataService() {
+            const resultDiv = document.getElementById('result')
+            resultDiv.innerHTML = '<div class="info">🔄 Testing data service...</div>'
+            
+            try {
+                console.log('🧪 Testing data service calls...')
+                
+                // Simulate what happens when dataService is used
+                const client = getSupabaseClient()
+                const { data: { session } } = await client.auth.getSession()
+                
+                if (!session) {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Not Logged In</h3>
+                            <p>You need to be logged in to test data service.</p>
+                        </div>
+                    `
+                    return
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h3>✅ Data Service Test</h3>
+                        <p>User logged in: ${session.user.email}</p>
+                        <p>Access token available: ${session.access_token ? 'Yes' : 'No'}</p>
+                        <p>🎉 Data service should work without client warnings!</p>
+                    </div>
+                `
+                
+            } catch (err) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>💥 Test Failed</h3>
+                        <p>${err.message}</p>
+                    </div>
+                `
+            }
+        }
+    </script>
+</body>
+</html>

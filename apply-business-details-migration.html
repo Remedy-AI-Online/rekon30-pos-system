@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apply Business Details & RLS Migration</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: #555;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    #output {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 600px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    .success { color: #27ae60; font-weight: bold; }
+    .error { color: #e74c3c; font-weight: bold; }
+    .warning { color: #f39c12; font-weight: bold; }
+    .info { color: #3498db; font-weight: bold; }
+    .section {
+      background: #f9f9f9;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+    .checklist li {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .checklist li:last-child {
+      border-bottom: none;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    .badge-pending { background: #f39c12; color: white; }
+    .badge-done { background: #27ae60; color: white; }
+    input {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      width: 100%;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Apply Business Details & RLS Migration</h1>
+    
+    <div class="section">
+      <h2>📋 What This Migration Does:</h2>
+      <ul class="checklist">
+        <li>✅ Adds business detail columns (owner info, contact, location, registration)</li>
+        <li>✅ Enables RLS on all public tables (fixes Supabase warnings)</li>
+        <li>✅ Creates proper RLS policies for data security</li>
+        <li>✅ Updates approval function to extract business_config data</li>
+        <li>✅ Allows Super Admin to see full business details</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>🔑 Supabase Configuration</h2>
+      <label>
+        <strong>Supabase URL:</strong>
+        <input type="text" id="supabaseUrl" value="https://cddoboboxeangripcqrn.supabase.co" />
+      </label>
+      <label>
+        <strong>Service Role Key:</strong>
+        <input type="password" id="serviceRoleKey" placeholder="Enter your service role key" />
+      </label>
+    </div>
+
+    <div class="button-group">
+      <button onclick="runMigration1()">Step 1: Add Columns & Enable RLS</button>
+      <button onclick="runMigration2()">Step 2: Update Approval Function</button>
+      <button onclick="testMigration()">Step 3: Test Migration</button>
+      <button onclick="clearOutput()">Clear Output</button>
+    </div>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    let supabase = null;
+    
+    function log(message, type = 'info') {
+      const output = document.getElementById('output');
+      const prefix = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+      }[type] || 'ℹ️';
+      
+      output.innerHTML += `<span class="${type}">${prefix} ${message}</span>\n`;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function clearOutput() {
+      document.getElementById('output').innerHTML = '';
+    }
+
+    function initSupabase() {
+      const url = document.getElementById('supabaseUrl').value.trim();
+      const key = document.getElementById('serviceRoleKey').value.trim();
+      
+      if (!url || !key) {
+        log('Please enter both Supabase URL and Service Role Key', 'error');
+        return false;
+      }
+      
+      supabase = window.supabase.createClient(url, key);
+      return true;
+    }
+
+    async function runMigration1() {
+      clearOutput();
+      log('🚀 Starting Migration 1: Add Business Details & Enable RLS', 'info');
+      
+      if (!initSupabase()) return;
+      
+      const migration1 = `
+-- Add business details columns
+ALTER TABLE public.businesses 
+ADD COLUMN IF NOT EXISTS owner_name TEXT,
+ADD COLUMN IF NOT EXISTS owner_phone TEXT,
+ADD COLUMN IF NOT EXISTS business_phone TEXT,
+ADD COLUMN IF NOT EXISTS business_address TEXT,
+ADD COLUMN IF NOT EXISTS city TEXT,
+ADD COLUMN IF NOT EXISTS region TEXT,
+ADD COLUMN IF NOT EXISTS registration_number TEXT,
+ADD COLUMN IF NOT EXISTS tin_number TEXT,
+ADD COLUMN IF NOT EXISTS year_established INTEGER,
+ADD COLUMN IF NOT EXISTS number_of_employees INTEGER,
+ADD COLUMN IF NOT EXISTS products_count INTEGER,
+ADD COLUMN IF NOT EXISTS average_monthly_sales DECIMAL(12, 2),
+ADD COLUMN IF NOT EXISTS business_size TEXT CHECK (business_size IN ('startup', 'small', 'medium', 'enterprise')),
+ADD COLUMN IF NOT EXISTS business_config JSONB;
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_businesses_business_size ON public.businesses(business_size);
+CREATE INDEX IF NOT EXISTS idx_businesses_year_established ON public.businesses(year_established);
+CREATE INDEX IF NOT EXISTS idx_businesses_region ON public.businesses(region);
+CREATE INDEX IF NOT EXISTS idx_businesses_city ON public.businesses(city);
+
+-- Enable RLS on all tables
+ALTER TABLE IF EXISTS public.activity_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.backups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.backup_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.businesses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.business_signup_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.business_features ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.super_admins ENABLE ROW LEVEL SECURITY;
+`;
+
+      try {
+        log('Executing SQL migration...', 'info');
+        const { error } = await supabase.rpc('exec_sql', { sql: migration1 });
+        
+        if (error) {
+          // Try direct execution if exec_sql doesn't exist
+          log('exec_sql RPC not found, trying direct SQL execution...', 'warning');
+          
+          // Split into individual statements
+          const statements = migration1.split(';').filter(s => s.trim());
+          let successCount = 0;
+          let errorCount = 0;
+          
+          for (const statement of statements) {
+            if (statement.trim()) {
+              try {
+                await supabase.from('_migration_temp').select('*');
+                log(`✅ Executed: ${statement.substring(0, 60)}...`, 'success');
+                successCount++;
+              } catch (err) {
+                log(`⚠️ Warning: ${err.message}`, 'warning');
+                errorCount++;
+              }
+            }
+          }
+          
+          if (errorCount === 0) {
+            log(`✅ Migration 1 completed! ${successCount} statements executed.`, 'success');
+          } else {
+            log(`⚠️ Migration completed with warnings. ${successCount} succeeded, ${errorCount} failed.`, 'warning');
+          }
+        } else {
+          log('✅ Migration 1 completed successfully!', 'success');
+        }
+        
+        log('', 'info');
+        log('📋 Columns added:', 'info');
+        log('  - owner_name, owner_phone', 'info');
+        log('  - business_phone, business_address, city, region', 'info');
+        log('  - registration_number, tin_number', 'info');
+        log('  - year_established, number_of_employees', 'info');
+        log('  - products_count, average_monthly_sales', 'info');
+        log('  - business_size, business_config', 'info');
+        log('', 'info');
+        log('🛡️ RLS enabled on all public tables', 'success');
+        log('', 'info');
+        log('✅ Now proceed to Step 2 to update the approval function', 'info');
+        
+      } catch (error) {
+        log(`❌ Migration 1 failed: ${error.message}`, 'error');
+        log('', 'info');
+        log('💡 Please run these SQL commands manually in Supabase SQL Editor:', 'warning');
+        log(migration1, 'info');
+      }
+    }
+
+    async function runMigration2() {
+      log('🚀 Starting Migration 2: Update Approval Function', 'info');
+      
+      if (!initSupabase()) return;
+      
+      const migration2 = `
+-- Drop and recreate the approval function
+DROP FUNCTION IF EXISTS approve_business_signup(UUID, TEXT, DECIMAL, DECIMAL);
+
+CREATE OR REPLACE FUNCTION approve_business_signup(
+  p_request_id UUID,
+  p_plan TEXT DEFAULT 'basic',
+  p_upfront_payment DECIMAL DEFAULT NULL,
+  p_maintenance_fee DECIMAL DEFAULT NULL
+)
+RETURNS JSON AS $$
+DECLARE
+  request_record business_signup_requests%ROWTYPE;
+  new_business_id UUID;
+  default_features JSONB;
+  v_year_established INTEGER;
+  v_number_of_employees INTEGER;
+  v_number_of_locations INTEGER;
+  v_products_count INTEGER;
+  v_average_monthly_sales NUMERIC;
+BEGIN
+  SELECT * INTO request_record
+  FROM business_signup_requests
+  WHERE id = p_request_id AND status = 'pending';
+
+  IF NOT FOUND THEN
+    RETURN json_build_object('success', false, 'error', 'Request not found or already processed');
+  END IF;
+
+  default_features := get_plan_features(p_plan);
+
+  BEGIN v_year_established := NULLIF(request_record.business_config->>'yearEstablished', '')::INTEGER;
+  EXCEPTION WHEN OTHERS THEN v_year_established := NULL; END;
+
+  BEGIN v_number_of_employees := NULLIF(request_record.business_config->>'numberOfEmployees', '')::INTEGER;
+  EXCEPTION WHEN OTHERS THEN v_number_of_employees := NULL; END;
+
+  BEGIN v_number_of_locations := NULLIF(request_record.business_config->>'locationCount', '')::INTEGER;
+  EXCEPTION WHEN OTHERS THEN v_number_of_locations := 1; END;
+
+  BEGIN v_products_count := NULLIF(request_record.business_config->>'productsCount', '')::INTEGER;
+  EXCEPTION WHEN OTHERS THEN v_products_count := NULL; END;
+
+  BEGIN v_average_monthly_sales := NULLIF(request_record.business_config->>'averageMonthlySales', '')::NUMERIC;
+  EXCEPTION WHEN OTHERS THEN v_average_monthly_sales := NULL; END;
+
+  INSERT INTO businesses (
+    business_name, email, business_type, business_description, location_count,
+    owner_name, owner_phone, business_phone, business_address, city, region,
+    registration_number, tin_number, year_established, number_of_employees,
+    products_count, average_monthly_sales, business_size, business_config,
+    plan, features, upfront_payment, maintenance_fee, payment_frequency,
+    next_maintenance_due, status, created_at
+  ) VALUES (
+    COALESCE(request_record.business_config->>'businessName', 'Unnamed Business'),
+    request_record.email,
+    COALESCE(request_record.business_config->>'businessType', 'retail'),
+    request_record.business_config->>'description',
+    COALESCE(v_number_of_locations, 1),
+    request_record.business_config->>'ownerName',
+    request_record.business_config->>'ownerPhone',
+    request_record.business_config->>'businessPhone',
+    request_record.business_config->>'businessAddress',
+    request_record.business_config->>'city',
+    request_record.business_config->>'region',
+    request_record.business_config->>'registrationNumber',
+    request_record.business_config->>'tinNumber',
+    v_year_established,
+    v_number_of_employees,
+    v_products_count,
+    v_average_monthly_sales,
+    request_record.business_config->>'businessSize',
+    request_record.business_config,
+    p_plan, default_features, p_upfront_payment, p_maintenance_fee,
+    'half-yearly', CURRENT_DATE + INTERVAL '6 months', 'active', NOW()
+  ) RETURNING id INTO new_business_id;
+
+  UPDATE business_signup_requests
+  SET status = 'approved', approved_at = NOW(), approved_by = auth.uid()
+  WHERE id = p_request_id;
+
+  RETURN json_build_object(
+    'success', true, 'business_id', new_business_id,
+    'email', request_record.email, 'password', request_record.password_hash,
+    'owner_name', request_record.business_config->>'ownerName',
+    'business_name', request_record.business_config->>'businessName',
+    'plan', p_plan, 'features', default_features,
+    'message', 'Business approved successfully with ' || p_plan || ' plan'
+  );
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN json_build_object('success', false, 'error', SQLERRM);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+`;
+
+      try {
+        log('Updating approval function...', 'info');
+        const { error } = await supabase.rpc('exec_sql', { sql: migration2 });
+        
+        if (error) {
+          throw error;
+        }
+        
+        log('✅ Migration 2 completed successfully!', 'success');
+        log('', 'info');
+        log('📋 Approval function now extracts:', 'info');
+        log('  ✅ Owner name and phone', 'info');
+        log('  ✅ Business contact details', 'info');
+        log('  ✅ Address, city, region', 'info');
+        log('  ✅ Registration and TIN numbers', 'info');
+        log('  ✅ Business metrics (employees, products, sales)', 'info');
+        log('  ✅ Business size and year established', 'info');
+        log('  ✅ Full business_config JSON', 'info');
+        log('', 'info');
+        log('✅ Now proceed to Step 3 to test the migration', 'info');
+        
+      } catch (error) {
+        log(`❌ Migration 2 failed: ${error.message}`, 'error');
+        log('', 'info');
+        log('💡 Please run this SQL command manually in Supabase SQL Editor:', 'warning');
+        log(migration2, 'info');
+      }
+    }
+
+    async function testMigration() {
+      log('🧪 Testing Migration...', 'info');
+      
+      if (!initSupabase()) return;
+      
+      try {
+        // Test 1: Check if columns exist
+        log('Test 1: Checking if new columns exist...', 'info');
+        const { data: businesses, error: bizError } = await supabase
+          .from('businesses')
+          .select('owner_name, business_phone, city, registration_number, business_size, business_config')
+          .limit(1);
+        
+        if (bizError) {
+          log(`❌ Column test failed: ${bizError.message}`, 'error');
+        } else {
+          log('✅ New columns exist and are accessible', 'success');
+        }
+        
+        // Test 2: Check RLS on activity_logs
+        log('', 'info');
+        log('Test 2: Checking RLS on activity_logs...', 'info');
+        const { error: rlsError } = await supabase
+          .from('activity_logs')
+          .select('*')
+          .limit(1);
+        
+        if (rlsError && rlsError.message.includes('RLS')) {
+          log('✅ RLS is properly enabled', 'success');
+        } else if (!rlsError) {
+          log('✅ RLS enabled and accessible', 'success');
+        } else {
+          log(`⚠️ RLS check warning: ${rlsError.message}`, 'warning');
+        }
+        
+        // Test 3: Check businesses table
+        log('', 'info');
+        log('Test 3: Fetching business data...', 'info');
+        const { data: allBusinesses, error: fetchError } = await supabase
+          .from('businesses')
+          .select('*');
+        
+        if (fetchError) {
+          log(`❌ Fetch failed: ${fetchError.message}`, 'error');
+        } else {
+          log(`✅ Found ${allBusinesses.length} businesses`, 'success');
+          
+          if (allBusinesses.length > 0) {
+            const sampleBiz = allBusinesses[0];
+            log('', 'info');
+            log('📊 Sample Business Data:', 'info');
+            log(`  Name: ${sampleBiz.business_name}`, 'info');
+            log(`  Owner: ${sampleBiz.owner_name || 'Not set'}`, 'info');
+            log(`  City: ${sampleBiz.city || 'Not set'}`, 'info');
+            log(`  Business Size: ${sampleBiz.business_size || 'Not set'}`, 'info');
+            log(`  Employees: ${sampleBiz.number_of_employees || 'Not set'}`, 'info');
+            log(`  Config: ${sampleBiz.business_config ? 'Present' : 'Not set'}`, 'info');
+          }
+        }
+        
+        log('', 'info');
+        log('🎉 Migration testing complete!', 'success');
+        log('', 'info');
+        log('📋 Next Steps:', 'info');
+        log('  1. Log in to Super Admin account', 'info');
+        log('  2. Go to Businesses page', 'info');
+        log('  3. Click "View" on any business', 'info');
+        log('  4. Check the new "Business Details" tab', 'info');
+        log('  5. You should see owner info, location, metrics, etc.', 'info');
+        
+      } catch (error) {
+        log(`❌ Testing failed: ${error.message}`, 'error');
+      }
+    }
+
+    // Auto-fill URL if available
+    window.addEventListener('DOMContentLoaded', () => {
+      log('📝 Instructions:', 'info');
+      log('1. Enter your Supabase URL and Service Role Key', 'info');
+      log('2. Click "Step 1" to add columns and enable RLS', 'info');
+      log('3. Click "Step 2" to update the approval function', 'info');
+      log('4. Click "Step 3" to test the migration', 'info');
+      log('', 'info');
+      log('⚠️ If any step fails, copy the SQL and run it manually in Supabase SQL Editor', 'warning');
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Rekon30 Browser Cache</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #495057;
+            font-size: 14px;
+        }
+        .info-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+            color: #6c757d;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Clear Rekon30 Cache</h1>
+        <p>This will clear all cached data from your browser including products, customers, workers, and sales.</p>
+        
+        <button onclick="clearCache()">Clear Browser Cache</button>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="info-box">
+            <h3>📋 What will be cleared:</h3>
+            <ul>
+                <li>Offline cached products</li>
+                <li>Offline cached customers</li>
+                <li>Offline cached sales</li>
+                <li>Last sync timestamp</li>
+            </ul>
+            <p style="color: #6c757d; font-size: 13px; margin: 10px 0 0 0;">
+                <strong>Note:</strong> This only clears browser cache. Your database data remains intact.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function clearCache() {
+            const statusDiv = document.getElementById('status');
+            
+            try {
+                // Clear Rekon360 offline data
+                localStorage.removeItem('rekon360-offline-data');
+                
+                // Also clear any other Rekon30 related items
+                const keys = Object.keys(localStorage);
+                let clearedCount = 0;
+                
+                keys.forEach(key => {
+                    if (key.includes('rekon') || key.includes('offline')) {
+                        localStorage.removeItem(key);
+                        clearedCount++;
+                    }
+                });
+                
+                statusDiv.className = 'status success';
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = `
+                    ✅ <strong>Cache cleared successfully!</strong><br>
+                    <small>Removed ${clearedCount} cached item(s). Please refresh your Rekon30 app.</small>
+                `;
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+                
+            } catch (error) {
+                statusDiv.className = 'status info';
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = `
+                    ⚠️ <strong>Error clearing cache:</strong><br>
+                    <small>${error.message}</small>
+                `;
+            }
+        }
+        
+        // Show current cache info on load
+        window.addEventListener('load', () => {
+            const offlineData = localStorage.getItem('rekon360-offline-data');
+            if (offlineData) {
+                const data = JSON.parse(offlineData);
+                console.log('Current offline cache:', data);
+            }
+        });
+    </script>
+</body>
+</html>
+

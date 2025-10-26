@@ -1,0 +1,7 @@
+
+# Rekon30 Backup Cron Job
+# Runs every 5 minutes
+*/5 * * * * curl -X POST "https://your-project.supabase.co/functions/v1/cron-backup" \
+  -H "Authorization: Bearer YOUR_SERVICE_ROLE_KEY" \
+  -H "Content-Type: application/json"
+    
