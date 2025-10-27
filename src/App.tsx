@@ -28,6 +28,7 @@ import { Sheet, SheetContent } from "./components/ui/sheet"
 import { authService } from "./utils/authService"
 import { Toaster } from "./components/ui/sonner"
 import { Analytics } from "@vercel/analytics/react"
+import { LandingPage } from "./components/LandingPage"
 
 export default function App() {
   const [user, setUser] = useState<any>(null)
@@ -37,6 +38,7 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768)
   const [businessConfig, setBusinessConfig] = useState<BusinessConfig | null>(null)
+  const [showLandingPage, setShowLandingPage] = useState(true)
 
   // Update page title based on current section
   useEffect(() => {
@@ -96,6 +98,10 @@ export default function App() {
     setBusinessConfig(null)
   }
 
+  const handleGetStarted = () => {
+    setShowLandingPage(false)
+  }
+
   const handleBusinessSetupComplete = (config: BusinessConfig) => {
     setBusinessConfig(config)
     // Store business config in localStorage
@@ -122,6 +128,16 @@ export default function App() {
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
+    )
+  }
+
+  // Show landing page first if user hasn't clicked "Get Started"
+  if (showLandingPage && !user) {
+    return (
+      <>
+        <LandingPage onGetStarted={handleGetStarted} />
+        <Analytics />
+      </>
     )
   }
 
