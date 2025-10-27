@@ -8,12 +8,10 @@ import {
   Monitor,
   Smartphone,
   Tablet,
-  ShoppingCart,
   CreditCard,
   BarChart3,
   Package,
   Users,
-  Headphones,
   Phone,
   Mail,
   MessageSquare,
@@ -26,60 +24,6 @@ interface LandingPageProps {
 
 export function LandingPage({ onGetStarted }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  const features = [
-    {
-      icon: Globe,
-      title: "Omnichannel",
-      description: "Sell everywhere your customers are—online, in-person, and across all channels."
-    },
-    {
-      icon: CreditCard,
-      title: "Integrated payments dashboard",
-      description: "Accept payments anywhere with our built-in payment processing."
-    },
-    {
-      icon: Package,
-      title: "Ready-to-go software",
-      description: "Get started instantly with pre-built templates and easy setup."
-    },
-    {
-      icon: BarChart3,
-      title: "Synced inventory",
-      description: "Keep your inventory in sync across all sales channels automatically."
-    },
-    {
-      icon: Users,
-      title: "Unified reporting",
-      description: "Get insights from all your sales channels in one comprehensive dashboard."
-    },
-    {
-      icon: MessageSquare,
-      title: "Built-in marketing tools",
-      description: "Grow your business with integrated email marketing and customer management."
-    }
-  ]
-
-  const posSystems = [
-    {
-      icon: Monitor,
-      title: "Register",
-      description: "Complete POS system for your store",
-      features: ["Touch screen", "Receipt printer", "Cash drawer", "Barcode scanner"]
-    },
-    {
-      icon: Smartphone,
-      title: "Mobile",
-      description: "Take payments anywhere with your phone",
-      features: ["Mobile payments", "Card reader", "Receipt via SMS", "Offline mode"]
-    },
-    {
-      icon: Tablet,
-      title: "Go",
-      description: "Lightweight solution for small businesses",
-      features: ["Tablet-based", "Easy setup", "Affordable", "Perfect for startups"]
-    }
-  ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -264,7 +208,38 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
+            {[
+              {
+                icon: Globe,
+                title: "Omnichannel",
+                description: "Sell everywhere your customers are—online, in-person, and across all channels."
+              },
+              {
+                icon: CreditCard,
+                title: "Integrated payments dashboard",
+                description: "Accept payments anywhere with our built-in payment processing."
+              },
+              {
+                icon: Package,
+                title: "Ready-to-go software",
+                description: "Get started instantly with pre-built templates and easy setup."
+              },
+              {
+                icon: BarChart3,
+                title: "Synced inventory",
+                description: "Keep your inventory in sync across all sales channels automatically."
+              },
+              {
+                icon: Users,
+                title: "Unified reporting",
+                description: "Get insights from all your sales channels in one comprehensive dashboard."
+              },
+              {
+                icon: MessageSquare,
+                title: "Built-in marketing tools",
+                description: "Grow your business with integrated email marketing and customer management."
+              }
+            ].map((feature, index) => (
               <div key={index} className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
                   <feature.icon className="w-6 h-6 text-blue-600" />
@@ -290,7 +265,26 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {posSystems.map((system, index) => (
+            {[
+              {
+                icon: Monitor,
+                title: "Register",
+                description: "Complete POS system for your store",
+                features: ["Touch screen", "Receipt printer", "Cash drawer", "Barcode scanner"]
+              },
+              {
+                icon: Smartphone,
+                title: "Mobile",
+                description: "Take payments anywhere with your phone",
+                features: ["Mobile payments", "Card reader", "Receipt via SMS", "Offline mode"]
+              },
+              {
+                icon: Tablet,
+                title: "Go",
+                description: "Lightweight solution for small businesses",
+                features: ["Tablet-based", "Easy setup", "Affordable", "Perfect for startups"]
+              }
+            ].map((system, index) => (
               <div key={index} className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 text-center">
                 <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
                   <system.icon className="w-8 h-8 text-gray-600" />
