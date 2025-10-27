@@ -27,6 +27,7 @@ import { Button } from "./components/ui/button"
 import { Sheet, SheetContent } from "./components/ui/sheet"
 import { authService } from "./utils/authService"
 import { Toaster } from "./components/ui/sonner"
+import { Analytics } from "@vercel/analytics/react"
 
 export default function App() {
   const [user, setUser] = useState<any>(null)
@@ -107,6 +108,7 @@ export default function App() {
       <>
         <AuthPage onLogin={handleLogin} onBusinessSetupComplete={handleBusinessSetupComplete} />
         <Toaster />
+        <Analytics />
       </>
     )
   }
@@ -118,6 +120,7 @@ export default function App() {
       <>
         <SuperAdminPanel onLogout={handleLogout} />
         <Toaster />
+        <Analytics />
       </>
     )
   }
@@ -131,6 +134,7 @@ export default function App() {
       <>
         <CashierDashboard user={user} accessToken={accessToken} onLogout={handleLogout} selectedFeatures={businessConfig?.selectedFeatures} />
         <Toaster />
+        <Analytics />
       </>
     )
   }
@@ -255,6 +259,7 @@ export default function App() {
         </main>
       </div>
       <Toaster />
+      <Analytics />
     </>
   )
 }
