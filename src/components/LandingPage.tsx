@@ -1,34 +1,23 @@
 import { useState } from "react"
 import { Button } from "./ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
-import { Badge } from "./ui/badge"
 import { 
-  Smartphone, 
-  CreditCard, 
-  DollarSign, 
-  Building2, 
-  BarChart3, 
-  Package, 
-  MessageSquare, 
-  Phone, 
-  Mail, 
-  CheckCircle,
-  Star,
-  Users,
-  ArrowRight,
-  Play,
-  Shield,
-  Zap,
   Menu,
   X,
-  Globe,
-  Award,
-  TrendingUp,
-  Headphones,
   ChevronDown,
-  ShoppingCart,
+  ArrowRight,
+  Monitor,
+  Smartphone,
   Tablet,
-  Monitor
+  ShoppingCart,
+  CreditCard,
+  BarChart3,
+  Package,
+  Users,
+  Headphones,
+  Phone,
+  Mail,
+  MessageSquare,
+  Globe
 } from "lucide-react"
 
 interface LandingPageProps {
@@ -40,91 +29,61 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
 
   const features = [
     {
-      icon: MessageSquare,
-      title: "E-Receipts via SMS",
-      description: "Send digital receipts via SMS - no printer needed! Perfect for Ghanaian businesses.",
-      color: "text-green-600"
+      icon: Globe,
+      title: "Omnichannel",
+      description: "Sell everywhere your customers are—online, in-person, and across all channels."
     },
     {
-      icon: Smartphone,
-      title: "Mobile Money Integration",
-      description: "Accept MoMo, AirtelTigo Money, and other mobile payments seamlessly.",
-      color: "text-blue-600"
-    },
-    {
-      icon: DollarSign,
-      title: "Bargaining System",
-      description: "Set price ranges for products. Let customers bargain within your limits.",
-      color: "text-orange-600"
-    },
-    {
-      icon: Building2,
-      title: "Multi-Location Support",
-      description: "Manage multiple shops, branches, or locations from one dashboard.",
-      color: "text-purple-600"
-    },
-    {
-      icon: BarChart3,
-      title: "Real-time Analytics",
-      description: "Track sales, inventory, and performance with live dashboards.",
-      color: "text-red-600"
+      icon: CreditCard,
+      title: "Integrated payments dashboard",
+      description: "Accept payments anywhere with our built-in payment processing."
     },
     {
       icon: Package,
-      title: "Inventory Management",
-      description: "Keep track of stock levels, low stock alerts, and product management.",
-      color: "text-indigo-600"
-    }
-  ]
-
-  const testimonials = [
-    {
-      name: "Kwame Asante",
-      business: "Asante Electronics",
-      location: "Accra",
-      text: "Rekon360 has transformed my business. The SMS receipts are a game-changer!",
-      rating: 5
+      title: "Ready-to-go software",
+      description: "Get started instantly with pre-built templates and easy setup."
     },
     {
-      name: "Ama Serwaa",
-      business: "Serwaa's Kitchen",
-      location: "Kumasi", 
-      text: "Managing multiple locations is now so easy. My sales have increased by 40%!",
-      rating: 5
+      icon: BarChart3,
+      title: "Synced inventory",
+      description: "Keep your inventory in sync across all sales channels automatically."
     },
     {
-      name: "Kofi Mensah",
-      business: "Mensah Stores",
-      location: "Tamale",
-      text: "The mobile money integration is perfect for my customers. Highly recommended!",
-      rating: 5
+      icon: Users,
+      title: "Unified reporting",
+      description: "Get insights from all your sales channels in one comprehensive dashboard."
+    },
+    {
+      icon: MessageSquare,
+      title: "Built-in marketing tools",
+      description: "Grow your business with integrated email marketing and customer management."
     }
   ]
 
   const posSystems = [
     {
-      name: "Rekon360 Register",
-      description: "Complete POS system for your store with tablet, card reader, and cash drawer.",
-      image: "register",
-      features: ["Tablet Display", "Card Reader", "Cash Drawer", "Receipt Printer"]
+      icon: Monitor,
+      title: "Register",
+      description: "Complete POS system for your store",
+      features: ["Touch screen", "Receipt printer", "Cash drawer", "Barcode scanner"]
     },
     {
-      name: "Rekon360 Mobile",
-      description: "Sell anywhere with our mobile POS solution. Perfect for markets and pop-ups.",
-      image: "mobile",
-      features: ["Mobile App", "Card Reader", "SMS Receipts", "Offline Mode"]
+      icon: Smartphone,
+      title: "Mobile",
+      description: "Take payments anywhere with your phone",
+      features: ["Mobile payments", "Card reader", "Receipt via SMS", "Offline mode"]
     },
     {
-      name: "Rekon360 Go",
-      description: "Handheld device for quick transactions. Ideal for restaurants and services.",
-      image: "handheld",
-      features: ["Handheld Device", "Quick Checkout", "Inventory Sync", "Real-time Reports"]
+      icon: Tablet,
+      title: "Go",
+      description: "Lightweight solution for small businesses",
+      features: ["Tablet-based", "Easy setup", "Affordable", "Perfect for startups"]
     }
   ]
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header - Wix Style */}
+      {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
@@ -198,7 +157,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
         </div>
       </header>
 
-      {/* Hero Section - Wix Style */}
+      {/* Hero Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -292,261 +251,175 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Features Section - Wix Style */}
+      {/* Features Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-black mb-6">
               Succeed with our advanced Point of Sale features
             </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Everything you need to run your business efficiently, from inventory management to customer insights.
+            </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Smartphone,
-                title: "Omnichannel solution",
-                description: "Sell wherever is best for you—in-person, online via your eCommerce site or social media. Take payments in your store, salon or gym and on the go at your next pop-up."
-              },
-              {
-                icon: BarChart3,
-                title: "Integrated payments dashboard",
-                description: "Control your business transactions right from your dashboard. Review payments, handle refunds, schedule payouts and more."
-              },
-              {
-                icon: Zap,
-                title: "Ready-to-go software",
-                description: "Rekon360 POS hardware comes with its software pre-installed. Just plug it in, log in to your account and start selling—no need for any third-party setup."
-              },
-              {
-                icon: Package,
-                title: "Synced inventory",
-                description: "Manage your inventory for both your online and in-person sales from one place. Each sale you make automatically syncs with your dashboard."
-              },
-              {
-                icon: TrendingUp,
-                title: "Unified reporting",
-                description: "Track your sales, taxes, employee reports and more for online and in-person sales—conveniently from one place."
-              },
-              {
-                icon: Users,
-                title: "Built-in marketing tools",
-                description: "Attract new customers with built-in tools. Encourage return customers with personalized checkout, discounts and loyalty rewards."
-              }
-            ].map((feature, index) => {
-              const Icon = feature.icon
-              return (
-                <div key={index} className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-6">
-                    <Icon className="w-6 h-6 text-gray-700" />
-                  </div>
-                  <h3 className="text-xl font-bold text-black mb-4">{feature.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
 
-      {/* POS Systems Section - Wix Style */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-black mb-6">
-              POS systems tailored to your business
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {posSystems.map((system, index) => (
-              <Card key={index} className="border border-gray-200 shadow-sm">
-                <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    {system.image === 'register' && <Monitor className="w-8 h-8 text-gray-700" />}
-                    {system.image === 'mobile' && <Smartphone className="w-8 h-8 text-gray-700" />}
-                    {system.image === 'handheld' && <Tablet className="w-8 h-8 text-gray-700" />}
-                  </div>
-                  <CardTitle className="text-xl font-bold text-black">{system.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <CardDescription className="text-gray-600 mb-6 leading-relaxed">
-                    {system.description}
-                  </CardDescription>
-                  <ul className="space-y-2 mb-6 text-left">
-                    {system.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center text-sm text-gray-600">
-                        <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button 
-                    onClick={onGetStarted}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                  >
-                    Talk to Sales
-                  </Button>
-                </CardContent>
-              </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div key={index} className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                  <feature.icon className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-black mb-4">{feature.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Pricing Section - Wix Style */}
+      {/* POS Systems Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-black mb-6">
+              Choose the right POS system for your business
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              From mobile payments to full register systems, we have the perfect solution for every business type.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {posSystems.map((system, index) => (
+              <div key={index} className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <system.icon className="w-8 h-8 text-gray-600" />
+                </div>
+                <h3 className="text-2xl font-semibold text-black mb-4">{system.title}</h3>
+                <p className="text-gray-600 mb-6">{system.description}</p>
+                <ul className="text-left mb-8 space-y-2">
+                  {system.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-center text-gray-600">
+                      <div className="w-2 h-2 bg-blue-600 rounded-full mr-3"></div>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                  Talk to Sales
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-black mb-6">
-            Simple, Transparent Pricing
+            Simple, transparent pricing
           </h2>
-          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-            Start free, scale smart. No hidden fees, no surprises.
+          <p className="text-xl text-gray-600 mb-12">
+            Start free, then choose the plan that fits your business needs.
           </p>
-          
-          <Card className="max-w-md mx-auto shadow-lg border border-gray-200">
-            <CardHeader className="text-center pb-6 pt-8">
-              <Badge className="w-fit mx-auto mb-4 bg-green-100 text-green-800 text-sm px-4 py-2 font-semibold">
-                Most Popular
-              </Badge>
-              <CardTitle className="text-2xl font-bold text-black">Free Trial</CardTitle>
-              <CardDescription className="text-lg text-gray-600 mt-2">
-                Perfect for getting started
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center pb-8 px-8">
-              <div className="mb-6">
-                <span className="text-5xl font-bold text-black">₵0</span>
-                <span className="text-xl text-gray-600 ml-2">/month</span>
-                <p className="text-sm text-gray-500 mt-2">First 3 months</p>
-              </div>
-              
-              <ul className="space-y-3 mb-8 text-left">
-                <li className="flex items-center text-sm">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  All features included
-                </li>
-                <li className="flex items-center text-sm">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  SMS E-receipts
-                </li>
-                <li className="flex items-center text-sm">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  Mobile money integration
-                </li>
-                <li className="flex items-center text-sm">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  Multi-location support
-                </li>
-                <li className="flex items-center text-sm">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  Bargaining system
-                </li>
-                <li className="flex items-center text-sm">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  Real-time analytics
-                </li>
-                <li className="flex items-center text-sm">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                  WhatsApp support
-                </li>
-              </ul>
-              
-              <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                <p className="text-sm text-yellow-800 font-semibold">
-                  <strong>After 3 months:</strong> ₵50/month
-                </p>
-              </div>
-              
-              <Button 
-                onClick={onGetStarted}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-3 font-bold"
-              >
-                Get Started
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
 
-      {/* Contact Section - Wix Style */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-black mb-6">
-            Ready to Transform Your Business?
-          </h2>
-          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-            Get in touch with our team. We're here to help!
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4">
-                <MessageSquare className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">WhatsApp</h3>
-              <p className="text-gray-600 mb-4">+233 533 009 352</p>
-              <Button 
-                variant="outline" 
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                onClick={() => window.open('https://wa.me/233533009352', '_blank')}
-              >
-                Chat Now
-              </Button>
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200 max-w-md mx-auto">
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold text-black mb-2">Professional</h3>
+              <div className="text-4xl font-bold text-black mb-2">₵50<span className="text-lg text-gray-600">/month</span></div>
+              <p className="text-gray-600">Perfect for growing businesses</p>
             </div>
             
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-                <Phone className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Phone</h3>
-              <p className="text-gray-600 mb-4">+233 546 887 539</p>
-              <Button 
-                variant="outline" 
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                onClick={() => window.open('tel:+233546887539', '_self')}
-              >
-                Call Now
-              </Button>
-            </div>
-            
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mb-4">
-                <Mail className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Email</h3>
-              <p className="text-gray-600 mb-4">rekon360@gmail.com</p>
-              <Button 
-                variant="outline" 
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                onClick={() => window.open('mailto:rekon360@gmail.com', '_self')}
-              >
-                Send Email
-              </Button>
-            </div>
-          </div>
-          
-          <div className="flex justify-center">
+            <ul className="text-left mb-8 space-y-3">
+              <li className="flex items-center text-gray-600">
+                <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                All basic features included
+              </li>
+              <li className="flex items-center text-gray-600">
+                <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                Multi-location support
+              </li>
+              <li className="flex items-center text-gray-600">
+                <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                Priority support
+              </li>
+              <li className="flex items-center text-gray-600">
+                <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                Advanced analytics
+              </li>
+            </ul>
+
             <Button 
               onClick={onGetStarted}
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 font-bold"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-4 font-semibold"
             >
-              <Users className="w-5 h-5 mr-2" />
-              Get Started
+              Get Started Free
             </Button>
+            
+            <p className="text-sm text-gray-500 mt-4">
+              First 3 months completely FREE
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Footer - Wix Style */}
-      <footer className="bg-gray-800 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            {/* Company Info */}
+      {/* Contact Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold text-black mb-6">
+            Ready to get started?
+          </h2>
+          <p className="text-xl text-gray-600 mb-12">
+            Join thousands of Ghanaian businesses already using Rekon360.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <Button 
+              variant="outline" 
+              className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-4 text-lg font-semibold"
+            >
+              <Phone className="w-5 h-5 mr-2" />
+              +233 546 887 539
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-4 text-lg font-semibold"
+            >
+              <Mail className="w-5 h-5 mr-2" />
+              rekon360@gmail.com
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-4 text-lg font-semibold"
+            >
+              <MessageSquare className="w-5 h-5 mr-2" />
+              WhatsApp Support
+            </Button>
+          </div>
+
+          <Button 
+            onClick={onGetStarted}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-12 py-4 font-semibold"
+          >
+            Start Your Free Trial
+          </Button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Logo */}
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-r from-red-600 to-yellow-500 rounded flex items-center justify-center">
@@ -554,42 +427,37 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                 </div>
                 <span className="text-2xl font-bold">REKON360</span>
               </div>
-              <p className="text-gray-400 mb-4 max-w-md">
-                Complete POS system designed specifically for Ghanaian businesses. 
-                E-receipts, mobile money, bargaining, and multi-location support.
+              <p className="text-gray-400 mb-4">
+                Complete POS system designed for Ghanaian businesses. 
+                Manage your business efficiently with our powerful tools.
               </p>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h3 className="font-semibold mb-4">Product</h3>
+              <h3 className="text-lg font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Reviews</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Demo</a></li>
+                <li><a href="#" className="hover:text-white">Features</a></li>
+                <li><a href="#" className="hover:text-white">Pricing</a></li>
+                <li><a href="#" className="hover:text-white">Integrations</a></li>
+                <li><a href="#" className="hover:text-white">API</a></li>
               </ul>
             </div>
 
             {/* Support */}
             <div>
-              <h3 className="font-semibold mb-4">Support</h3>
+              <h3 className="text-lg font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Status</a></li>
+                <li><a href="#" className="hover:text-white">Help Center</a></li>
+                <li><a href="#" className="hover:text-white">Contact Us</a></li>
+                <li><a href="#" className="hover:text-white">Status</a></li>
+                <li><a href="#" className="hover:text-white">Community</a></li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <div className="text-gray-400 mb-4 md:mb-0">
-              © 2024 Rekon360. All rights reserved.
-            </div>
-            <div className="text-gray-400 text-sm">
-              Made with ❤️ for Ghanaian businesses
-            </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 Rekon360. All rights reserved.</p>
           </div>
         </div>
       </footer>
