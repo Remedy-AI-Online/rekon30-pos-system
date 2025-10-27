@@ -38,6 +38,29 @@ export default function App() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768)
   const [businessConfig, setBusinessConfig] = useState<BusinessConfig | null>(null)
 
+  // Update page title based on current section
+  useEffect(() => {
+    const getPageTitle = () => {
+      if (!user) return "Rekon360 - Complete POS System for Ghanaian Businesses"
+      if (user.role === 'super_admin') return "Super Admin Panel - Rekon360"
+      if (user.role === 'cashier') return "Cashier Dashboard - Rekon360"
+      
+      const sectionTitles: { [key: string]: string } = {
+        dashboard: "Dashboard - Rekon360",
+        products: "Product Management - Rekon360",
+        orders: "Order Management - Rekon360",
+        customers: "Customer Management - Rekon360",
+        workers: "Worker Management - Rekon360",
+        reports: "Reports & Analytics - Rekon360",
+        settings: "Settings - Rekon360"
+      }
+      
+      return sectionTitles[activeSection] || "Rekon360 - Complete POS System for Ghanaian Businesses"
+    }
+    
+    document.title = getPageTitle()
+  }, [user, activeSection])
+
   // Check for existing session on mount
   useEffect(() => {
     const checkSession = async () => {
