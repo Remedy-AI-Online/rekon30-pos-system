@@ -22,6 +22,51 @@ interface LandingPageProps {
   onGetStarted: () => void
 }
 
+// Logo Component
+function Rekon360Logo({ className = "" }: { className?: string }) {
+  return (
+    <div className={`flex items-center space-x-3 ${className}`}>
+      {/* Logo Icon */}
+      <div className="relative w-8 h-8">
+        <svg 
+          viewBox="0 0 32 32" 
+          className="w-8 h-8"
+          fill="none"
+        >
+          {/* Dark blue ring */}
+          <circle 
+            cx="16" 
+            cy="16" 
+            r="14" 
+            stroke="#1e3a8a" 
+            strokeWidth="4"
+            fill="none"
+            strokeDasharray="88 22"
+            strokeDashoffset="0"
+            transform="rotate(-45 16 16)"
+          />
+          {/* Mint green segment */}
+          <circle 
+            cx="16" 
+            cy="16" 
+            r="14" 
+            stroke="#10b981" 
+            strokeWidth="4"
+            fill="none"
+            strokeDasharray="22 88"
+            strokeDashoffset="-66"
+            transform="rotate(-45 16 16)"
+          />
+        </svg>
+      </div>
+      {/* Logo Text */}
+      <span className="text-2xl font-bold text-blue-900">
+        Rekon360
+      </span>
+    </div>
+  )
+}
+
 export function LandingPage({ onGetStarted }: LandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -32,14 +77,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-red-600 to-yellow-500 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">R</span>
-              </div>
-              <span className="text-2xl font-bold text-black">
-                REKON360
-              </span>
-            </div>
+            <Rekon360Logo />
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
@@ -138,12 +176,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                 <div className="space-y-6">
                   {/* Mock Dashboard Header */}
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-red-600 to-yellow-500 rounded flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">R</span>
-                      </div>
-                      <span className="font-semibold text-gray-900">Rekon360 Checkout</span>
-                    </div>
+                    <Rekon360Logo className="text-sm" />
                     <div className="flex space-x-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                       <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -415,12 +448,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Logo */}
             <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-red-600 to-yellow-500 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">R</span>
-                </div>
-                <span className="text-2xl font-bold">REKON360</span>
-              </div>
+              <Rekon360Logo className="text-white mb-4" />
               <p className="text-gray-400 mb-4">
                 Complete POS system designed for Ghanaian businesses. 
                 Manage your business efficiently with our powerful tools.
